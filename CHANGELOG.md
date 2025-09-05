@@ -1,6 +1,16 @@
 # Changelog
 
-## [Unreleased] - 2025-09-03
+## [Unreleased] - 2025-09-05
+
+### Changed
+- **Language Migration**: Complete migration from Kotlin to Java
+  - Migrated all source code from Kotlin (.kt) to Java (.java)
+  - Updated build configuration from build.gradle.kts to build.gradle
+  - Converted Gradle settings from Kotlin DSL to Groovy
+  - Removed Kotlin-specific dependencies and plugins
+  - Maintained all existing functionality and API contracts
+
+## 2025-09-03
 
 ### Added
 - **Database Schema**: Complete Flyway migrations for core entities (products, platforms, credentials, listings, orders, buyers, addresses, fees)
