@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 2025-09-07
+
+### Added
+- **Orders**: JPA entity, repository, and REST controller; relationships to Platform; unique (platform_id, external_order_id); status and date indexing
+
 ## 2025-09-06
 
 ### Added
