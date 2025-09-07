@@ -12,7 +12,11 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "products", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
+@Table(
+    name = "products", 
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})}
+)
+
 public class Product 
 {
     // * Attributes
