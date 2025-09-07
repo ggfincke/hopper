@@ -6,10 +6,12 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class HopperApplicationTests {
+class HopperApplicationTests 
+{
 
     @Test
-    void contextLoads() {
+    void contextLoads() 
+    {
     }
 
 }
