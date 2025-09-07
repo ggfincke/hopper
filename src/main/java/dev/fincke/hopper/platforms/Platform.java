@@ -1,36 +1,48 @@
 package dev.fincke.hopper.platforms;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "platforms", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
+@Table(
+    name = "platforms",
+    uniqueConstraints = {@UniqueConstraint(name = "uq_platforms_name", columnNames = {"name"})},
+    indexes = {@Index(name = "idx_platforms_type", columnList = "platform_type")}
+)
 public class Platform 
 {
-    
+    // * Attributes
+
+    // UUID for platform
     @Id
     @GeneratedValue
     @UuidGenerator
     private UUID id;
 
-    @Column(nullable = false)
+    // name of platform
+    @NotBlank
+    @Column(name = "name", nullable = false)
     private String name = "";
 
+    // type/category of platform
+    @NotBlank
     @Column(name = "platform_type", nullable = false)
     private String platformType = "";
 
-    public Platform() 
-    {
-    }
+    // * Contructors
 
+    protected Platform() {}
     public Platform(String name, String platformType) 
     {
         this.name = name;
         this.platformType = platformType;
     }
+
+    // * Getters and Setters
 
     public UUID getId() 
     {
@@ -62,23 +74,19 @@ public class Platform
         this.platformType = platformType;
     }
 
+    // * Overrides
     @Override
     public boolean equals(Object o) 
     {
-        if (this == o) 
-            return true;
-        if (o == null || getClass() != o.getClass()) 
-            return false;
-        Platform platform = (Platform) o;
-        return Objects.equals(id, platform.id) &&
-               Objects.equals(name, platform.name) &&
-               Objects.equals(platformType, platform.platformType);
+        if (this == o) return true;
+        if (!(o instanceof Platform other)) return false;
+        return id != null && id.equals(other.id);
     }
 
     @Override
     public int hashCode() 
     {
-        return Objects.hash(id, name, platformType);
+        return id != null ? id.hashCode() : 0;
     }
 
     @Override
