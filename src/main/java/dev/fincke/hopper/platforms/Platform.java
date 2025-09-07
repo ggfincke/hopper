@@ -8,7 +8,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "platforms", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
-public class Platform {
+public class Platform 
+{
     
     @Id
     @GeneratedValue
@@ -21,42 +22,53 @@ public class Platform {
     @Column(name = "platform_type", nullable = false)
     private String platformType = "";
 
-    public Platform() {
+    public Platform() 
+    {
     }
 
-    public Platform(String name, String platformType) {
+    public Platform(String name, String platformType) 
+    {
         this.name = name;
         this.platformType = platformType;
     }
 
-    public UUID getId() {
+    public UUID getId() 
+    {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(UUID id) 
+    {
         this.id = id;
     }
 
-    public String getName() {
+    public String getName() 
+    {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name) 
+    {
         this.name = name;
     }
 
-    public String getPlatformType() {
+    public String getPlatformType() 
+    {
         return platformType;
     }
 
-    public void setPlatformType(String platformType) {
+    public void setPlatformType(String platformType) 
+    {
         this.platformType = platformType;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object o) 
+    {
+        if (this == o) 
+            return true;
+        if (o == null || getClass() != o.getClass()) 
+            return false;
         Platform platform = (Platform) o;
         return Objects.equals(id, platform.id) &&
                Objects.equals(name, platform.name) &&
@@ -64,12 +76,14 @@ public class Platform {
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode() 
+    {
         return Objects.hash(id, name, platformType);
     }
 
     @Override
-    public String toString() {
+    public String toString() 
+    {
         return "Platform{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
