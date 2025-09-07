@@ -1,6 +1,24 @@
 # Changelog
 
-## [Unreleased] - 2025-09-05
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## 2025-09-06
+
+### Added
+- **Product API**: REST controller with DTOs; aligned schema and repository
+- **Listings**: JPA entity, repository, and REST endpoint; price normalized to decimal(12,2); FKs to Products and Platforms; unique (platform_id, external_listing_id)
+
+### Changed
+- **Platforms**: entity cleanups (naming, annotations, indexes) for clarity and consistency
+- **Code Style**: Allman brace style enforced across the codebase and applied to new Listings code
+- **Documentation**: consolidated and moved root docs to `docs/`; added SCHEMA.md and additional docs placeholders
+
+## 2025-09-05
 
 ### Changed
 - **Language Migration**: Complete migration from Kotlin to Java
