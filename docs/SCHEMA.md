@@ -8,6 +8,7 @@ This document provides a clean, human-friendly overview of the core entities, fi
 erDiagram
     Products {
         uuid id PK
+        string name UK
         string sku UK
         string description
         decimal price
@@ -101,13 +102,14 @@ Legend: `PK` primary key • `FK` foreign key • `UK` unique key
 ### Products
 Merchandise tracked and listed on various platforms.
 
-| Column     | Type    | Constraints | Notes |
-|------------|---------|-------------|-------|
-| id         | uuid    | PK          | Generated UUID identifier |
-| sku        | string  | UK          | Stock-keeping unit, unique per product |
-| description| string  |             | Human-friendly description |
-| price      | decimal |             | Unit price (e.g., currency) |
-| quantity   | integer |             | On-hand or available quantity |
+| Column      | Type          | Constraints     | Notes |
+|-------------|---------------|-----------------|-------|
+| id          | uuid          | PK              | Generated UUID identifier |
+| name        | string        | NN, UK          | Unique product name |
+| sku         | string        | UK (nullable)   | Stock-keeping unit; unique when present |
+| description | string        |                 | Human-friendly description |
+| price       | decimal(12,2) | NN              | Unit price; stored with scale 2 |
+| quantity    | integer       | NN              | On-hand or available quantity |
 
 Relationships: one Product can have many Listings.
 
@@ -120,7 +122,7 @@ External marketplaces or channels where products are listed and orders originate
 |---------------|--------|-------------|-------|
 | id            | uuid   | PK          | |
 | name          | string | UK          | Human-readable name (e.g., "eBay", "Etsy") |
-| platform_type | string |             | Free-form or enum-like type label |
+| platform_type | string | IDX         | Free-form or enum-like type label; indexed in code |
 
 Relationships: one Platform has many Listings, Orders, and Platform_Credentials.
 
@@ -238,7 +240,7 @@ Fees charged by the Platform for an Order.
 ## Conventions & Notes
 
 - Types: `uuid`, `string`, `integer`, `decimal`, `timestamp`, `boolean` as shown in the ERD.
-- Money fields: consider a consistent precision/scale (e.g., decimal(10,2)).
+- Money fields: use decimal(12,2) per current Product implementation.
 - Status fields: document expected values in application code or enums.
 - Indexes: foreign keys and unique keys should be indexed for performance.
 - Naming: snake_case table names and columns; pluralized table names per ERD.
