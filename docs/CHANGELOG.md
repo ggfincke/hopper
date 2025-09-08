@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Orders**: JPA entity, repository, and REST controller; relationships to Platform; unique (platform_id, external_order_id); status and date indexing
+- **OrderItems**: JPA entity, repository, and REST controller; relationships to Order and Listing; quantity and price tracking
+- **Documentation**: COMMENT-STYLE.md guide with Java beginner-focused comment conventions; section markers, annotation explanations, and relationship documentation patterns
 
 ## 2025-09-06
 
