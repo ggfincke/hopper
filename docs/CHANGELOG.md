@@ -7,7 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## 2025-09-08
+
+### Changed
+- **Package Reorganization**: Restructured all entities into domain-driven package hierarchy
+  - Moved catalog-related entities (Product, Listing) to `catalog/` package with nested subpackages
+  - Moved order-related entities (Order, OrderItem, Buyer, OrderAddress) to `order/` package with nested subpackages
+  - Moved platform-related entities (Platform, PlatformCredential, PlatformFee) to `platform/` package with nested subpackages
+  - Improved code organization and modularity while maintaining all functionality and API contracts
+
+### Previously Added
 - **PlatformCredentials**: JPA entity, repository, and REST controller; many-to-one relationship to Platform; encrypted credential storage with key-value pairs; active/inactive status tracking; unique constraint on (platform_id, credential_key)
 - **PlatformFees**: JPA entity, repository, and REST controller; many-to-one relationship to Order; fee tracking by type with monetary amounts; aggregation queries for totals by order and fee type
 

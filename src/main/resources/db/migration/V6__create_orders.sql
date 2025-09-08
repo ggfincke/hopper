@@ -5,7 +5,7 @@ CREATE TABLE orders (
   external_order_id  TEXT NOT NULL,
   status             TEXT NOT NULL,
   total_amount       NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (total_amount >= 0),
-  order_date         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  order_date         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   CONSTRAINT uq_orders_external_per_platform
     UNIQUE (platform_id, external_order_id)
