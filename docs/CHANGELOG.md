@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Product Service Layer**: Business logic implementation with ProductService interface and full CRUD operations
+- **Product DTOs**: Request/response objects with validation (ProductCreateRequest, ProductUpdateRequest, ProductResponse)
+- **Product Exceptions**: Custom exceptions for business operations (DuplicateSkuException, InsufficientStockException, ProductNotFoundException)
+- **Enhanced ProductRepository**: Query methods for SKU lookup, name search, and stock filtering with Optional returns
+- **Stock Management**: Inventory adjustment endpoints with negative stock prevention
+
+### Changed
+- **ProductController**: Refactored to use service layer pattern instead of direct repository access
+- **Code Formatting**: Improved consistency across controllers and repositories
+
 ## 2025-09-08
 
 ### Changed

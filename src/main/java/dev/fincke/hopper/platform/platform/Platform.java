@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -13,7 +12,7 @@ import java.util.UUID;
     uniqueConstraints = {@UniqueConstraint(name = "uq_platforms_name", columnNames = {"name"})},
     indexes = {@Index(name = "idx_platforms_type", columnList = "platform_type")}
 )
-public class Platform 
+public class Platform
 {
     // * Attributes
 
@@ -36,7 +35,7 @@ public class Platform
     // * Contructors
 
     protected Platform() {}
-    public Platform(String name, String platformType) 
+    public Platform(String name, String platformType)
     {
         this.name = name;
         this.platformType = platformType;
@@ -44,39 +43,39 @@ public class Platform
 
     // * Getters and Setters
 
-    public UUID getId() 
+    public UUID getId()
     {
         return id;
     }
 
-    public void setId(UUID id) 
+    public void setId(UUID id)
     {
         this.id = id;
     }
 
-    public String getName() 
+    public String getName()
     {
         return name;
     }
 
-    public void setName(String name) 
+    public void setName(String name)
     {
         this.name = name;
     }
 
-    public String getPlatformType() 
+    public String getPlatformType()
     {
         return platformType;
     }
 
-    public void setPlatformType(String platformType) 
+    public void setPlatformType(String platformType)
     {
         this.platformType = platformType;
     }
 
     // * Overrides
     @Override
-    public boolean equals(Object o) 
+    public boolean equals(Object o)
     {
         if (this == o) return true;
         if (!(o instanceof Platform other)) return false;
@@ -84,13 +83,13 @@ public class Platform
     }
 
     @Override
-    public int hashCode() 
+    public int hashCode()
     {
         return id != null ? id.hashCode() : 0;
     }
 
     @Override
-    public String toString() 
+    public String toString()
     {
         return "Platform{" +
                 "id=" + id +

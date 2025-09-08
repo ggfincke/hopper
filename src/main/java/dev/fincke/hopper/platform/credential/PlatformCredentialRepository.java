@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface PlatformCredentialRepository extends JpaRepository<PlatformCredential, UUID> 
+public interface PlatformCredentialRepository extends JpaRepository<PlatformCredential, UUID>
 {
     
     List<PlatformCredential> findByPlatformId(UUID platformId);

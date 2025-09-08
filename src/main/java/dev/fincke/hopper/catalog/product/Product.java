@@ -17,7 +17,7 @@ import java.util.UUID;
     uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})}
 )
 
-public class Product 
+public class Product
 {
     // * Attributes
 
@@ -53,7 +53,7 @@ public class Product
     // * Contructor
     protected Product() {}
 
-    public Product(String sku, String name, BigDecimal price) 
+    public Product(String sku, String name, BigDecimal price)
     {
         this.sku = Objects.requireNonNull(sku, "sku").trim();
         this.name = Objects.requireNonNull(name, "name").trim();
@@ -64,33 +64,33 @@ public class Product
     // * Getters and Setters
 
     // product ID
-    public UUID getId() 
+    public UUID getId()
     {
         return id;
     }
 
-    public void setId(UUID id) 
+    public void setId(UUID id)
     {
         this.id = id;
     }
 
     // name
-    public String getName() 
+    public String getName()
     {
         return name;
     }
 
-    public void setName(String name) 
+    public void setName(String name)
     {
         this.name = name == null ? null : name.trim();
     }
 
     // SKU
-    public String getSku() 
+    public String getSku()
     {
         return sku;
     }   
-    public void setSku(String sku) 
+    public void setSku(String sku)
     {
         this.sku = sku;
     }
@@ -138,7 +138,7 @@ public class Product
     }
 
     @Override
-    public int hashCode() 
+    public int hashCode()
     {
         return id != null ? id.hashCode() : 0;
     }

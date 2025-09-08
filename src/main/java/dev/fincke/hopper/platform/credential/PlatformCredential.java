@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity

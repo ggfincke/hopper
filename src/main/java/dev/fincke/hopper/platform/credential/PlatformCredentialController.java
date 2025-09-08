@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-class PlatformCredentialDto 
+class PlatformCredentialDto
 {
     private final String id;
     private final String platformId;
@@ -19,7 +19,7 @@ class PlatformCredentialDto
     private final String credentialValue;
     private final Boolean isActive;
 
-    public PlatformCredentialDto(String id, String platformId, String platformName, String credentialKey, String credentialValue, Boolean isActive) 
+    public PlatformCredentialDto(String id, String platformId, String platformName, String credentialKey, String credentialValue, Boolean isActive)
     {
         this.id = id;
         this.platformId = platformId;
@@ -29,80 +29,80 @@ class PlatformCredentialDto
         this.isActive = isActive;
     }
 
-    public String getId() 
+    public String getId()
     {
         return id;
     }
 
-    public String getPlatformId() 
+    public String getPlatformId()
     {
         return platformId;
     }
 
-    public String getPlatformName() 
+    public String getPlatformName()
     {
         return platformName;
     }
 
-    public String getCredentialKey() 
+    public String getCredentialKey()
     {
         return credentialKey;
     }
 
-    public String getCredentialValue() 
+    public String getCredentialValue()
     {
         return credentialValue;
     }
 
-    public Boolean getIsActive() 
+    public Boolean getIsActive()
     {
         return isActive;
     }
 }
 
-class CreatePlatformCredentialRequest 
+class CreatePlatformCredentialRequest
 {
     private String platformId;
     private String credentialKey;
     private String credentialValue;
     private Boolean isActive = true;
 
-    public String getPlatformId() 
+    public String getPlatformId()
     {
         return platformId;
     }
 
-    public void setPlatformId(String platformId) 
+    public void setPlatformId(String platformId)
     {
         this.platformId = platformId;
     }
 
-    public String getCredentialKey() 
+    public String getCredentialKey()
     {
         return credentialKey;
     }
 
-    public void setCredentialKey(String credentialKey) 
+    public void setCredentialKey(String credentialKey)
     {
         this.credentialKey = credentialKey;
     }
 
-    public String getCredentialValue() 
+    public String getCredentialValue()
     {
         return credentialValue;
     }
 
-    public void setCredentialValue(String credentialValue) 
+    public void setCredentialValue(String credentialValue)
     {
         this.credentialValue = credentialValue;
     }
 
-    public Boolean getIsActive() 
+    public Boolean getIsActive()
     {
         return isActive;
     }
 
-    public void setIsActive(Boolean isActive) 
+    public void setIsActive(Boolean isActive)
     {
         this.isActive = isActive;
     }
@@ -110,13 +110,13 @@ class CreatePlatformCredentialRequest
 
 @RestController
 @RequestMapping("/api/platform-credentials")
-public class PlatformCredentialController 
+public class PlatformCredentialController
 {
     
     private final PlatformCredentialRepository repo;
     private final PlatformRepository platformRepo;
 
-    public PlatformCredentialController(PlatformCredentialRepository repo, PlatformRepository platformRepo) 
+    public PlatformCredentialController(PlatformCredentialRepository repo, PlatformRepository platformRepo)
     {
         this.repo = repo;
         this.platformRepo = platformRepo;
@@ -124,7 +124,7 @@ public class PlatformCredentialController
 
     @GetMapping
     public List<PlatformCredentialDto> list(@RequestParam(required = false) UUID platformId, 
-                                           @RequestParam(required = false) Boolean isActive) 
+                                           @RequestParam(required = false) Boolean isActive)
     {
         List<PlatformCredential> credentials;
         
@@ -144,7 +144,7 @@ public class PlatformCredentialController
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PlatformCredentialDto> getById(@PathVariable UUID id) 
+    public ResponseEntity<PlatformCredentialDto> getById(@PathVariable UUID id)
     {
         return repo.findById(id)
                 .map(credential -> ResponseEntity.ok(toDto(credential)))
@@ -152,7 +152,7 @@ public class PlatformCredentialController
     }
 
     @PostMapping
-    public ResponseEntity<PlatformCredentialDto> create(@RequestBody CreatePlatformCredentialRequest request) 
+    public ResponseEntity<PlatformCredentialDto> create(@RequestBody CreatePlatformCredentialRequest request)
     {
         try {
             UUID platformId = UUID.fromString(request.getPlatformId());
@@ -177,7 +177,7 @@ public class PlatformCredentialController
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PlatformCredentialDto> update(@PathVariable UUID id, @RequestBody CreatePlatformCredentialRequest request) 
+    public ResponseEntity<PlatformCredentialDto> update(@PathVariable UUID id, @RequestBody CreatePlatformCredentialRequest request)
     {
         return repo.findById(id)
                 .map(credential -> {
@@ -204,7 +204,7 @@ public class PlatformCredentialController
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) 
+    public ResponseEntity<Void> delete(@PathVariable UUID id)
     {
         if (repo.existsById(id)) {
             repo.deleteById(id);
@@ -214,7 +214,7 @@ public class PlatformCredentialController
         }
     }
 
-    private PlatformCredentialDto toDto(PlatformCredential credential) 
+    private PlatformCredentialDto toDto(PlatformCredential credential)
     {
         return new PlatformCredentialDto(
             credential.getId().toString(),

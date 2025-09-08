@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-class PlatformFeeDto 
+class PlatformFeeDto
 {
     private final String id;
     private final String orderId;
     private final String feeType;
     private final BigDecimal amount;
 
-    public PlatformFeeDto(String id, String orderId, String feeType, BigDecimal amount) 
+    public PlatformFeeDto(String id, String orderId, String feeType, BigDecimal amount)
     {
         this.id = id;
         this.orderId = orderId;
@@ -26,59 +26,59 @@ class PlatformFeeDto
         this.amount = amount;
     }
 
-    public String getId() 
+    public String getId()
     {
         return id;
     }
 
-    public String getOrderId() 
+    public String getOrderId()
     {
         return orderId;
     }
 
-    public String getFeeType() 
+    public String getFeeType()
     {
         return feeType;
     }
 
-    public BigDecimal getAmount() 
+    public BigDecimal getAmount()
     {
         return amount;
     }
 }
 
-class CreatePlatformFeeRequest 
+class CreatePlatformFeeRequest
 {
     private String orderId;
     private String feeType;
     private BigDecimal amount;
 
-    public String getOrderId() 
+    public String getOrderId()
     {
         return orderId;
     }
 
-    public void setOrderId(String orderId) 
+    public void setOrderId(String orderId)
     {
         this.orderId = orderId;
     }
 
-    public String getFeeType() 
+    public String getFeeType()
     {
         return feeType;
     }
 
-    public void setFeeType(String feeType) 
+    public void setFeeType(String feeType)
     {
         this.feeType = feeType;
     }
 
-    public BigDecimal getAmount() 
+    public BigDecimal getAmount()
     {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) 
+    public void setAmount(BigDecimal amount)
     {
         this.amount = amount;
     }
@@ -86,13 +86,13 @@ class CreatePlatformFeeRequest
 
 @RestController
 @RequestMapping("/api/platform-fees")
-public class PlatformFeeController 
+public class PlatformFeeController
 {
     
     private final PlatformFeeRepository repo;
     private final OrderRepository orderRepo;
 
-    public PlatformFeeController(PlatformFeeRepository repo, OrderRepository orderRepo) 
+    public PlatformFeeController(PlatformFeeRepository repo, OrderRepository orderRepo)
     {
         this.repo = repo;
         this.orderRepo = orderRepo;
@@ -102,7 +102,7 @@ public class PlatformFeeController
     public List<PlatformFeeDto> list(@RequestParam(required = false) UUID orderId,
                                     @RequestParam(required = false) String feeType,
                                     @RequestParam(required = false) BigDecimal minAmount,
-                                    @RequestParam(required = false) BigDecimal maxAmount) 
+                                    @RequestParam(required = false) BigDecimal maxAmount)
     {
         List<PlatformFee> fees;
         
@@ -128,7 +128,7 @@ public class PlatformFeeController
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PlatformFeeDto> getById(@PathVariable UUID id) 
+    public ResponseEntity<PlatformFeeDto> getById(@PathVariable UUID id)
     {
         return repo.findById(id)
                 .map(fee -> ResponseEntity.ok(toDto(fee)))
@@ -136,7 +136,7 @@ public class PlatformFeeController
     }
 
     @PostMapping
-    public ResponseEntity<PlatformFeeDto> create(@RequestBody CreatePlatformFeeRequest request) 
+    public ResponseEntity<PlatformFeeDto> create(@RequestBody CreatePlatformFeeRequest request)
     {
         try {
             UUID orderId = UUID.fromString(request.getOrderId());
@@ -160,7 +160,7 @@ public class PlatformFeeController
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PlatformFeeDto> update(@PathVariable UUID id, @RequestBody CreatePlatformFeeRequest request) 
+    public ResponseEntity<PlatformFeeDto> update(@PathVariable UUID id, @RequestBody CreatePlatformFeeRequest request)
     {
         return repo.findById(id)
                 .map(fee -> {
@@ -186,7 +186,7 @@ public class PlatformFeeController
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) 
+    public ResponseEntity<Void> delete(@PathVariable UUID id)
     {
         if (repo.existsById(id)) {
             repo.deleteById(id);
@@ -197,20 +197,20 @@ public class PlatformFeeController
     }
 
     @GetMapping("/totals/by-order/{orderId}")
-    public ResponseEntity<BigDecimal> getTotalFeesByOrder(@PathVariable UUID orderId) 
+    public ResponseEntity<BigDecimal> getTotalFeesByOrder(@PathVariable UUID orderId)
     {
         BigDecimal total = repo.getTotalFeesByOrderId(orderId);
         return ResponseEntity.ok(total != null ? total : BigDecimal.ZERO);
     }
 
     @GetMapping("/totals/by-type/{feeType}")
-    public ResponseEntity<BigDecimal> getTotalFeesByType(@PathVariable String feeType) 
+    public ResponseEntity<BigDecimal> getTotalFeesByType(@PathVariable String feeType)
     {
         BigDecimal total = repo.getTotalFeesByType(feeType);
         return ResponseEntity.ok(total != null ? total : BigDecimal.ZERO);
     }
 
-    private PlatformFeeDto toDto(PlatformFee fee) 
+    private PlatformFeeDto toDto(PlatformFee fee)
     {
         return new PlatformFeeDto(
             fee.getId().toString(),

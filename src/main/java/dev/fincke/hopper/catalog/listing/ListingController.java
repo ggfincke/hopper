@@ -62,13 +62,40 @@ public class ListingController
             this.quantityListed = quantityListed;
         }
 
-        public String getId() { return id; }
-        public String getProductId() { return productId; }
-        public String getPlatformId() { return platformId; }
-        public String getExternalListingId() { return externalListingId; }
-        public String getStatus() { return status; }
-        public BigDecimal getPrice() { return price; }
-        public int getQuantityListed() { return quantityListed; }
+        public String getId()
+        {
+            return id;
+        }
+
+        public String getProductId()
+        {
+            return productId;
+        }
+
+        public String getPlatformId()
+        {
+            return platformId;
+        }
+
+        public String getExternalListingId()
+        {
+            return externalListingId;
+        }
+
+        public String getStatus()
+        {
+            return status;
+        }
+
+        public BigDecimal getPrice()
+        {
+            return price;
+        }
+
+        public int getQuantityListed()
+        {
+            return quantityListed;
+        }
     }
 }
 
