@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **PlatformCredentials**: JPA entity, repository, and REST controller; many-to-one relationship to Platform; encrypted credential storage with key-value pairs; active/inactive status tracking; unique constraint on (platform_id, credential_key)
+
 ## 2025-09-07
 
 ### Added
