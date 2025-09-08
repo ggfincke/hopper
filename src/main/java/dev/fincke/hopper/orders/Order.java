@@ -1,5 +1,6 @@
 package dev.fincke.hopper.orders;
 
+import dev.fincke.hopper.buyers.Buyer;
 import dev.fincke.hopper.platforms.Platform;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
@@ -19,6 +20,7 @@ import java.util.UUID;
     uniqueConstraints = {@UniqueConstraint(name = "uq_orders_external_per_platform", columnNames = {"platform_id", "external_order_id"})},
     indexes = {
         @Index(name = "idx_orders_platform", columnList = "platform_id"),
+        @Index(name = "idx_orders_buyer", columnList = "buyer_id"),
         @Index(name = "idx_orders_status", columnList = "status"),
         @Index(name = "idx_orders_date", columnList = "order_date")
     }
@@ -36,6 +38,11 @@ public class Order
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "platform_id", nullable = false)
     private Platform platform;
+
+    // many orders may belong to one buyer (optional)
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyer_id", nullable = true)
+    private Buyer buyer;
 
     // identifier on the external platform
     @NotBlank
@@ -73,6 +80,22 @@ public class Order
         this.status = Objects.requireNonNull(status, "status").trim();
         this.totalAmount = Objects.requireNonNull(totalAmount, "totalAmount").setScale(2, RoundingMode.HALF_UP);
         this.orderDate = Objects.requireNonNull(orderDate, "orderDate");
+        this.buyer = null;
+    }
+
+    public Order(Platform platform,
+                 String externalOrderId,
+                 String status,
+                 BigDecimal totalAmount,
+                 Timestamp orderDate,
+                 Buyer buyer)
+    {
+        this.platform = Objects.requireNonNull(platform, "platform");
+        this.externalOrderId = Objects.requireNonNull(externalOrderId, "externalOrderId").trim();
+        this.status = Objects.requireNonNull(status, "status").trim();
+        this.totalAmount = Objects.requireNonNull(totalAmount, "totalAmount").setScale(2, RoundingMode.HALF_UP);
+        this.orderDate = Objects.requireNonNull(orderDate, "orderDate");
+        this.buyer = buyer;
     }
 
     // * Getters and Setters
@@ -97,6 +120,17 @@ public class Order
     public void setPlatform(Platform platform)
     {
         this.platform = platform;
+    }
+
+    // buyer
+    public Buyer getBuyer()
+    {
+        return buyer;
+    }
+
+    public void setBuyer(Buyer buyer)
+    {
+        this.buyer = buyer;
     }
 
     // external order ID
