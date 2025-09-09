@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Buyer Service Layer**: Complete business logic implementation with BuyerService interface and CRUD operations
+- **Buyer DTOs**: Request/response objects with validation (BuyerCreateRequest, BuyerUpdateRequest, BuyerResponse)
+- **Buyer Exceptions**: Custom exceptions for business operations (BuyerNotFoundException, DuplicateEmailException)
 - **Listing Service Layer**: Complete business logic with ListingService interface and CRUD operations
 - **Listing DTOs**: Request/response objects with validation and custom exceptions
 - **Status Management**: Activation/deactivation endpoints with business validation
@@ -18,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Stock Management**: Inventory adjustment endpoints with negative stock prevention
 
 ### Changed
+- **BuyerController**: Refactored to use service layer pattern with comprehensive REST endpoints
 - **ListingController**: Refactored to use service layer pattern with comprehensive REST endpoints
 - **ProductController**: Refactored to use service layer pattern instead of direct repository access
 - **Code Formatting**: Improved consistency across controllers and repositories
