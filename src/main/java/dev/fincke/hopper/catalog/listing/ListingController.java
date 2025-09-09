@@ -12,19 +12,14 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * REST controller for listing management operations.
- * 
- * Provides HTTP endpoints for CRUD operations, status management,
- * and query operations through the service layer.
- */
+// REST controller handling listing API endpoints
 @RestController
 @RequestMapping("/api/listings")
 public class ListingController
 {
     // * Dependencies
     
-    // service for business logic operations
+    // Spring will inject service dependency
     private final ListingService listingService;
 
     // * Constructor
@@ -36,6 +31,7 @@ public class ListingController
 
     // * Core CRUD Endpoints
     
+    // POST /api/listings - create new listing
     @PostMapping
     public ResponseEntity<ListingResponse> createListing(@Valid @RequestBody ListingCreateRequest request)
     {
@@ -43,24 +39,28 @@ public class ListingController
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
+    // PUT /api/listings/{id} - update existing listing
     @PutMapping("/{id}")
     public ListingResponse updateListing(@PathVariable UUID id, @Valid @RequestBody ListingUpdateRequest request)
     {
         return listingService.updateListing(id, request);
     }
     
+    // GET /api/listings/{id} - get listing by ID
     @GetMapping("/{id}")
     public ListingResponse getById(@PathVariable UUID id)
     {
         return listingService.findById(id);
     }
     
+    // GET /api/listings - get all listings
     @GetMapping
     public List<ListingResponse> getAllListings()
     {
         return listingService.findAll();
     }
     
+    // DELETE /api/listings/{id} - delete listing
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteListing(@PathVariable UUID id)
     {
@@ -70,18 +70,21 @@ public class ListingController
     
     // * Status Management Endpoints
     
+    // PUT /api/listings/{id}/status - update listing status
     @PutMapping("/{id}/status")
     public ListingResponse updateStatus(@PathVariable UUID id, @RequestParam String status)
     {
         return listingService.updateStatus(id, status);
     }
     
+    // POST /api/listings/{id}/activate - activate listing
     @PostMapping("/{id}/activate")
     public ListingResponse activateListing(@PathVariable UUID id)
     {
         return listingService.activateListing(id);
     }
     
+    // POST /api/listings/{id}/deactivate - deactivate listing
     @PostMapping("/{id}/deactivate") 
     public ListingResponse deactivateListing(@PathVariable UUID id)
     {
@@ -90,24 +93,28 @@ public class ListingController
     
     // * Query Endpoints
     
+    // GET /api/listings?productId={id} - find listings by product
     @GetMapping(params = "productId")
     public List<ListingResponse> getByProductId(@RequestParam UUID productId)
     {
         return listingService.findByProductId(productId);
     }
     
+    // GET /api/listings?platformId={id} - find listings by platform
     @GetMapping(params = "platformId")
     public List<ListingResponse> getByPlatformId(@RequestParam UUID platformId)
     {
         return listingService.findByPlatformId(platformId);
     }
     
+    // GET /api/listings?status={status} - find listings by status
     @GetMapping(params = "status")
     public List<ListingResponse> getByStatus(@RequestParam String status)
     {
         return listingService.findByStatus(status);
     }
     
+    // GET /api/listings?platformId={id}&externalListingId={id} - find by platform and external ID
     @GetMapping(params = {"platformId", "externalListingId"})
     public ListingResponse getByPlatformAndExternalId(@RequestParam UUID platformId, @RequestParam String externalListingId)
     {
@@ -116,12 +123,14 @@ public class ListingController
     
     // * Price and Quantity Update Endpoints
     
+    // PUT /api/listings/{id}/price - update listing price
     @PutMapping("/{id}/price")
     public ListingResponse updatePrice(@PathVariable UUID id, @RequestParam BigDecimal price)
     {
         return listingService.updatePrice(id, price);
     }
     
+    // PUT /api/listings/{id}/quantity - update listing quantity
     @PutMapping("/{id}/quantity")
     public ListingResponse updateQuantity(@PathVariable UUID id, @RequestParam int quantityListed)
     {

@@ -5,12 +5,7 @@ import dev.fincke.hopper.catalog.listing.Listing;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-/**
- * Response DTO for listing data.
- * 
- * Immutable representation of listing data for API responses.
- * Prevents accidental entity modification and provides clean API contract.
- */
+// Response DTO for listing data (immutable for API responses)
 public record ListingResponse(
     // listing ID
     UUID id,
@@ -35,7 +30,7 @@ public record ListingResponse(
 ) {
     // * Static Factory Methods
     
-    // creates ListingResponse from Listing entity
+    // create response from entity
     public static ListingResponse from(Listing listing) 
     {
         return new ListingResponse(

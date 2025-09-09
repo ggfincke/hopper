@@ -2,16 +2,12 @@ package dev.fincke.hopper.catalog.listing.exception;
 
 import java.util.UUID;
 
-/**
- * Exception thrown when a requested listing cannot be found in the system.
- * 
- * Used for operations that require an existing listing to be present.
- */
+// Exception thrown when a requested listing cannot be found
 public class ListingNotFoundException extends RuntimeException 
 {
     // * Attributes
     
-    // ID of the listing that was not found
+    // listing ID that was not found
     private final UUID listingId;
     
     // * Constructors
@@ -36,7 +32,7 @@ public class ListingNotFoundException extends RuntimeException
     
     // * Getters
     
-    // returns the ID of the listing that was not found (may be null for external ID-based lookups)
+    // listing ID (may be null for external ID lookups)
     public UUID getListingId() 
     {
         return listingId;

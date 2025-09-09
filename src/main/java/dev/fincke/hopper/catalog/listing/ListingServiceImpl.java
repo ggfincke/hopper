@@ -18,25 +18,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Service implementation for listing business operations.
- * 
- * Handles all listing-related business logic including validation, 
- * status management, and data transformation between entities and DTOs.
- */
+// Service implementation for listing business operations
 @Service
-@Transactional(readOnly = true) // default to read-only transactions
+@Transactional(readOnly = true) // default to read-only transactions for better performance
 public class ListingServiceImpl implements ListingService 
 {
     // * Dependencies
     
-    // repository for listing data access
+    // Spring will inject repository dependencies
     private final ListingRepository listingRepository;
-    
-    // repository for product data access (to validate product references)
     private final ProductRepository productRepository;
-    
-    // repository for platform data access (to validate platform references)
     private final PlatformRepository platformRepository;
     
     // * Constructor
@@ -53,30 +44,26 @@ public class ListingServiceImpl implements ListingService
     // * Core CRUD Operations
     
     @Override
-    @Transactional // write operation, requires full transaction
+    @Transactional // write operation requires full transaction
     public ListingResponse createListing(ListingCreateRequest request) 
     {
-        // validate product exists
         Product product = productRepository.findById(request.productId())
             .orElseThrow(() -> new IllegalArgumentException("Product with ID " + request.productId() + " not found"));
         
-        // validate platform exists
         Platform platform = platformRepository.findById(request.platformId())
             .orElseThrow(() -> new IllegalArgumentException("Platform with ID " + request.platformId() + " not found"));
         
-        // validate external listing ID uniqueness for this platform
+        // check for duplicate external listing ID on platform
         if (existsByPlatformAndExternalListingId(platform, request.externalListingId())) 
         {
             throw new DuplicateListingException(request.platformId(), request.externalListingId());
         }
         
-        // validate status is not empty after trimming
         if (request.status().trim().isEmpty()) 
         {
             throw new InvalidListingStatusException("Status cannot be empty");
         }
         
-        // create and populate entity
         Listing listing = new Listing(
             product,
             platform,
@@ -86,7 +73,6 @@ public class ListingServiceImpl implements ListingService
             request.quantityListed()
         );
         
-        // save and return response
         Listing savedListing = listingRepository.save(listing);
         return ListingResponse.from(savedListing);
     }
@@ -95,17 +81,15 @@ public class ListingServiceImpl implements ListingService
     @Transactional
     public ListingResponse updateListing(UUID id, ListingUpdateRequest request) 
     {
-        // find existing listing
         Listing listing = listingRepository.findById(id)
             .orElseThrow(() -> new ListingNotFoundException(id));
         
-        // validate that at least one field is provided for update
         if (!request.hasUpdates()) 
         {
             throw new IllegalArgumentException("At least one field must be provided for update");
         }
         
-        // update external listing ID if provided and different
+        // update external listing ID if changed
         if (request.externalListingId() != null && !request.externalListingId().equals(listing.getExternalListingId())) 
         {
             if (existsByPlatformAndExternalListingId(listing.getPlatform(), request.externalListingId())) 
@@ -115,7 +99,6 @@ public class ListingServiceImpl implements ListingService
             listing.setExternalListingId(request.externalListingId());
         }
         
-        // update status if provided
         if (request.status() != null) 
         {
             if (request.status().trim().isEmpty()) 
@@ -125,16 +108,14 @@ public class ListingServiceImpl implements ListingService
             listing.setStatus(request.status());
         }
         
-        // update price if provided
         if (request.price() != null) 
         {
-            listing.setPrice(request.price()); // BigDecimal scaling handled in entity setter
+            listing.setPrice(request.price());
         }
         
-        // update quantity if provided
         if (request.quantityListed() != null) 
         {
-            listing.setQuantityListed(request.quantityListed()); // non-negative validation handled in entity setter
+            listing.setQuantityListed(request.quantityListed());
         }
         
         Listing savedListing = listingRepository.save(listing);
@@ -166,7 +147,7 @@ public class ListingServiceImpl implements ListingService
             throw new ListingNotFoundException(id);
         }
         
-        // TODO: check for dependencies (active orders) before deletion
+        // TODO: validate no active orders before deletion
         listingRepository.deleteById(id);
     }
     
@@ -179,7 +160,6 @@ public class ListingServiceImpl implements ListingService
         Listing listing = listingRepository.findById(id)
             .orElseThrow(() -> new ListingNotFoundException(id));
         
-        // validate status is not empty after trimming
         if (status == null || status.trim().isEmpty()) 
         {
             throw new InvalidListingStatusException("Status cannot be empty");
@@ -250,7 +230,7 @@ public class ListingServiceImpl implements ListingService
         Listing listing = listingRepository.findById(id)
             .orElseThrow(() -> new ListingNotFoundException(id));
         
-        listing.setPrice(price); // BigDecimal scaling and validation handled in entity setter
+        listing.setPrice(price);
         Listing savedListing = listingRepository.save(listing);
         return ListingResponse.from(savedListing);
     }
@@ -262,14 +242,14 @@ public class ListingServiceImpl implements ListingService
         Listing listing = listingRepository.findById(id)
             .orElseThrow(() -> new ListingNotFoundException(id));
         
-        listing.setQuantityListed(quantityListed); // non-negative validation handled in entity setter
+        listing.setQuantityListed(quantityListed);
         Listing savedListing = listingRepository.save(listing);
         return ListingResponse.from(savedListing);
     }
     
     // * Private Helper Methods
     
-    // checks if a listing exists by platform and external listing ID (private helper for internal validation)
+    // check if listing exists by platform and external ID
     private boolean existsByPlatformAndExternalListingId(Platform platform, String externalListingId) 
     {
         return listingRepository.findByPlatformAndExternalListingId(platform, externalListingId.trim()).isPresent();

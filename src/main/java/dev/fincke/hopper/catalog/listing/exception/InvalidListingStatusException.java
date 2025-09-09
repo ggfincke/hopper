@@ -2,23 +2,18 @@ package dev.fincke.hopper.catalog.listing.exception;
 
 import java.util.UUID;
 
-/**
- * Exception thrown when attempting to set an invalid status on a listing
- * or when a status transition is not allowed.
- * 
- * Used to enforce business rules around listing status management.
- */
+// Exception thrown for invalid listing status or disallowed status transitions
 public class InvalidListingStatusException extends RuntimeException 
 {
     // * Attributes
     
-    // ID of the listing that had the invalid status
+    // listing ID with invalid status
     private final UUID listingId;
     
-    // the invalid status that was attempted
+    // invalid status that was attempted
     private final String attemptedStatus;
     
-    // the current status of the listing
+    // current status of the listing
     private final String currentStatus;
     
     // * Constructors
@@ -49,19 +44,19 @@ public class InvalidListingStatusException extends RuntimeException
     
     // * Getters
     
-    // returns the ID of the listing that had the invalid status
+    // listing ID
     public UUID getListingId() 
     {
         return listingId;
     }
     
-    // returns the invalid status that was attempted
+    // attempted status
     public String getAttemptedStatus() 
     {
         return attemptedStatus;
     }
     
-    // returns the current status of the listing (may be null)
+    // current status (may be null)
     public String getCurrentStatus() 
     {
         return currentStatus;

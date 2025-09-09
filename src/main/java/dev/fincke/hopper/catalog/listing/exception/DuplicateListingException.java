@@ -2,20 +2,15 @@ package dev.fincke.hopper.catalog.listing.exception;
 
 import java.util.UUID;
 
-/**
- * Exception thrown when attempting to create a listing with an external listing ID 
- * that already exists on the same platform.
- * 
- * External listing IDs must be unique per platform to prevent listing conflicts.
- */
+// Exception thrown when external listing ID already exists on platform
 public class DuplicateListingException extends RuntimeException 
 {
     // * Attributes
     
-    // the duplicate external listing ID that caused the exception
+    // duplicate external listing ID
     private final String externalListingId;
     
-    // the platform ID where the duplicate was found
+    // platform ID where duplicate was found
     private final UUID platformId;
     
     // * Constructors
@@ -43,13 +38,13 @@ public class DuplicateListingException extends RuntimeException
     
     // * Getters
     
-    // returns the duplicate external listing ID that caused this exception
+    // external listing ID
     public String getExternalListingId() 
     {
         return externalListingId;
     }
     
-    // returns the platform ID where the duplicate was found
+    // platform ID
     public UUID getPlatformId() 
     {
         return platformId;
