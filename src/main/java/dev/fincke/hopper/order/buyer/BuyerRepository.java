@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 // * Repository
-// Data-access layer for Buyer entities
+// Data access layer for Buyer entities (Spring Data JPA)
 public interface BuyerRepository extends JpaRepository<Buyer, UUID>
 {
     // find buyer by email address

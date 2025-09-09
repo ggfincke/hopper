@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-public interface PlatformFeeRepository extends JpaRepository<PlatformFee, UUID> 
+public interface PlatformFeeRepository extends JpaRepository<PlatformFee, UUID>
 {
     
     List<PlatformFee> findByOrderId(UUID orderId);

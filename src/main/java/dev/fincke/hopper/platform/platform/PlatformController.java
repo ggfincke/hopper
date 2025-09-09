@@ -7,30 +7,30 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class PlatformDto 
+class PlatformDto
 {
     private final String id;
     private final String name;
     private final String platformType;
 
-    public PlatformDto(String id, String name, String platformType) 
+    public PlatformDto(String id, String name, String platformType)
     {
         this.id = id;
         this.name = name;
         this.platformType = platformType;
     }
 
-    public String getId() 
+    public String getId()
     {
         return id;
     }
 
-    public String getName() 
+    public String getName()
     {
         return name;
     }
 
-    public String getPlatformType() 
+    public String getPlatformType()
     {
         return platformType;
     }
@@ -38,18 +38,18 @@ class PlatformDto
 
 @RestController
 @RequestMapping("/api/platforms")
-public class PlatformController 
+public class PlatformController
 {
     
     private final PlatformRepository repo;
 
-    public PlatformController(PlatformRepository repo) 
+    public PlatformController(PlatformRepository repo)
     {
         this.repo = repo;
     }
 
     @GetMapping
-    public List<PlatformDto> list() 
+    public List<PlatformDto> list()
     {
         return repo.findAll().stream()
                 .map(platform -> new PlatformDto(

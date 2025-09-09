@@ -1,125 +1,105 @@
 package dev.fincke.hopper.order.buyer;
 
+import dev.fincke.hopper.order.buyer.dto.BuyerCreateRequest;
+import dev.fincke.hopper.order.buyer.dto.BuyerResponse;
+import dev.fincke.hopper.order.buyer.dto.BuyerUpdateRequest;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+// REST controller handling buyer API endpoints
 @RestController
 @RequestMapping("/api/buyers")
 public class BuyerController
 {
+    
     // * Dependencies
-    // repository to access buyers
-    private final BuyerRepository repo;
-
+    
+    // Spring will inject service dependency
+    private final BuyerService buyerService;
+    
     // * Constructor
-    public BuyerController(BuyerRepository repo)
+    
+    // Constructor injection for BuyerService
+    public BuyerController(BuyerService buyerService)
     {
-        this.repo = repo;
+        this.buyerService = buyerService;
     }
-
-    // * Routes
-    // GET /api/buyers - list all buyers
-    @GetMapping
-    public List<BuyerDto> list()
+    
+    // * Core CRUD Endpoints
+    
+    // POST /api/buyers - create new buyer
+    @PostMapping
+    public ResponseEntity<BuyerResponse> createBuyer(@Valid @RequestBody BuyerCreateRequest request)
     {
-        return repo.findAll().stream()
-                .map(b -> new BuyerDto(
-                        b.getId().toString(),
-                        b.getEmail(),
-                        b.getName()))
-                .collect(Collectors.toList());
+        BuyerResponse response = buyerService.createBuyer(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
+    
+    // PUT /api/buyers/{id} - update existing buyer
+    @PutMapping("/{id}")
+    public BuyerResponse updateBuyer(@PathVariable UUID id, @Valid @RequestBody BuyerUpdateRequest request)
+    {
+        return buyerService.updateBuyer(id, request);
+    }
+    
     // GET /api/buyers/{id} - get buyer by ID
     @GetMapping("/{id}")
-    public ResponseEntity<BuyerDto> getById(@PathVariable String id)
+    public BuyerResponse getById(@PathVariable UUID id)
     {
-        try {
-            UUID buyerId = UUID.fromString(id);
-            Optional<Buyer> buyer = repo.findById(buyerId);
-            
-            if (buyer.isPresent()) {
-                Buyer b = buyer.get();
-                BuyerDto dto = new BuyerDto(
-                        b.getId().toString(),
-                        b.getEmail(),
-                        b.getName());
-                return ResponseEntity.ok(dto);
-            }
-            return ResponseEntity.notFound().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return buyerService.findById(id);
     }
-
+    
+    // GET /api/buyers - list all buyers
+    @GetMapping
+    public List<BuyerResponse> getAllBuyers()
+    {
+        return buyerService.findAll();
+    }
+    
+    // DELETE /api/buyers/{id} - delete buyer
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBuyer(@PathVariable UUID id)
+    {
+        buyerService.deleteBuyer(id);
+        return ResponseEntity.noContent().build();
+    }
+    
+    // * Query Endpoints
+    
     // GET /api/buyers/email/{email} - find buyer by email
     @GetMapping("/email/{email}")
-    public ResponseEntity<BuyerDto> getByEmail(@PathVariable String email)
+    public BuyerResponse getByEmail(@PathVariable String email)
     {
-        Buyer buyer = repo.findByEmail(email.toLowerCase());
-        if (buyer != null) {
-            BuyerDto dto = new BuyerDto(
-                    buyer.getId().toString(),
-                    buyer.getEmail(),
-                    buyer.getName());
-            return ResponseEntity.ok(dto);
-        }
-        return ResponseEntity.notFound().build();
+        return buyerService.findByEmail(email);
     }
-
+    
     // GET /api/buyers/search/{name} - search buyers by name
     @GetMapping("/search/{name}")
-    public List<BuyerDto> searchByName(@PathVariable String name)
+    public List<BuyerResponse> searchByName(@PathVariable String name)
     {
-        return repo.findByNameContainingIgnoreCase(name).stream()
-                .map(b -> new BuyerDto(
-                        b.getId().toString(),
-                        b.getEmail(),
-                        b.getName()))
-                .collect(Collectors.toList());
+        return buyerService.searchByName(name);
     }
-
-    // * DTO
-    // Represents a buyer in API responses
-    static class BuyerDto
+    
+    // * Utility Endpoints
+    
+    // GET /api/buyers/exists/email/{email} - check if email exists
+    @GetMapping("/exists/email/{email}")
+    public ResponseEntity<Boolean> existsByEmail(@PathVariable String email)
     {
-        // buyer ID
-        private final String id;
-        // email address
-        private final String email;
-        // display name
-        private final String name;
-
-        // * Constructor
-        public BuyerDto(String id, String email, String name)
-        {
-            this.id = id;
-            this.email = email;
-            this.name = name;
-        }
-
-        // * Getters (for serialization)
-        // buyer ID
-        public String getId()
-        {
-            return id;
-        }
-
-        // email
-        public String getEmail()
-        {
-            return email;
-        }
-
-        // name
-        public String getName()
-        {
-            return name;
-        }
+        boolean exists = buyerService.existsByEmail(email);
+        return ResponseEntity.ok(exists);
+    }
+    
+    // POST /api/buyers/{id}/validate - validate buyer data
+    @PostMapping("/{id}/validate")
+    public ResponseEntity<Void> validateBuyer(@PathVariable UUID id)
+    {
+        buyerService.validateBuyer(id);
+        return ResponseEntity.ok().build();
     }
 }

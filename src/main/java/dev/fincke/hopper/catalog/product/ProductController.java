@@ -1,106 +1,105 @@
 package dev.fincke.hopper.catalog.product;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import dev.fincke.hopper.catalog.product.dto.ProductCreateRequest;
+import dev.fincke.hopper.catalog.product.dto.ProductResponse;
+import dev.fincke.hopper.catalog.product.dto.ProductUpdateRequest;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
+/**
+ * REST controller for product operations.
+ * 
+ * Provides CRUD endpoints for product management with proper validation
+ * and error handling. Uses service layer for business logic.
+ */
 @RestController
 @RequestMapping("/api/products")
 public class ProductController
 {
     // * Dependencies
-    // repository to access products
-    private final ProductRepository repo;
+    
+    // service for product business logic
+    private final ProductService productService;
 
     // * Constructor
-    public ProductController(ProductRepository repo)
+    public ProductController(ProductService productService)
     {
-        this.repo = repo;
+        this.productService = productService;
     }
 
-    // * Routes
+    // * CRUD Endpoints
+    
+    // POST /api/products - create new product
+    @PostMapping
+    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductCreateRequest request)
+    {
+        ProductResponse response = productService.createProduct(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
     // GET /api/products - list all products
     @GetMapping
-    public List<ProductDto> list() 
+    public List<ProductResponse> listProducts()
     {
-        return repo.findAll().stream()
-                .map(p -> new ProductDto(
-                        p.getId().toString(),
-                        p.getSku(),
-                        p.getName(),
-                        p.getDescription(),
-                        p.getPrice(),
-                        p.getQuantity()))
-                .collect(Collectors.toList());
+        return productService.findAll();
     }
-
-    // * DTO
-    // Represents a product in API responses
-    static class ProductDto 
+    
+    // GET /api/products/{id} - get product by ID
+    @GetMapping("/{id}")
+    public ProductResponse getProduct(@PathVariable UUID id)
     {
-        // product ID
-        private final String id;
-        // SKU of product
-        private final String sku;
-        // name of product
-        private final String name;
-        // optional description
-        private final String description;
-        // price of product
-        private final BigDecimal price;
-        // quantity of product in stock
-        private final int quantity;
-
-        // * Constructor
-        public ProductDto(String id, String sku, String name, String description, BigDecimal price, int quantity)
-        {
-            this.id = id;
-            this.sku = sku;
-            this.name = name;
-            this.description = description;
-            this.price = price;
-            this.quantity = quantity;
-        }
-
-        // * Getters (for serialization)
-        // product ID
-        public String getId()
-        {
-            return id;
-        }
-
-        // SKU
-        public String getSku()
-        {
-            return sku;
-        }
-
-        // name
-        public String getName()
-        {
-            return name;
-        }
-
-        // description
-        public String getDescription()
-        {
-            return description;
-        }
-
-        // price
-        public BigDecimal getPrice()
-        {
-            return price;
-        }
-
-        // quantity
-        public int getQuantity()
-        {
-            return quantity;
-        }
+        return productService.findById(id);
+    }
+    
+    // PUT /api/products/{id} - update existing product
+    @PutMapping("/{id}")
+    public ProductResponse updateProduct(@PathVariable UUID id, @Valid @RequestBody ProductUpdateRequest request)
+    {
+        return productService.updateProduct(id, request);
+    }
+    
+    // DELETE /api/products/{id} - delete product
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id)
+    {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
+    
+    // * Query Endpoints
+    
+    // GET /api/products/sku/{sku} - find product by SKU
+    @GetMapping("/sku/{sku}")
+    public ProductResponse getProductBySku(@PathVariable String sku)
+    {
+        return productService.findBySku(sku);
+    }
+    
+    // GET /api/products/search - search products by name
+    @GetMapping("/search")
+    public List<ProductResponse> searchProducts(@RequestParam String name)
+    {
+        return productService.findByNameContaining(name);
+    }
+    
+    // GET /api/products/low-stock - find low stock products
+    @GetMapping("/low-stock")
+    public List<ProductResponse> getLowStockProducts(@RequestParam(defaultValue = "10") int threshold)
+    {
+        return productService.findLowStockProducts(threshold);
+    }
+    
+    // * Stock Management Endpoints
+    
+    // PATCH /api/products/{id}/stock - adjust stock quantity
+    @PatchMapping("/{id}/stock")
+    public ProductResponse adjustStock(@PathVariable UUID id, @RequestParam int adjustment)
+    {
+        return productService.adjustStock(id, adjustment);
     }
 }
