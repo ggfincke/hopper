@@ -14,7 +14,7 @@ public class DuplicateEmailException extends RuntimeException
         this.email = email;
     }
     
-    // email that caused the conflict
+    // Email that caused the conflict
     public String getEmail()
     {
         return email;

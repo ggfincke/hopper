@@ -1,161 +1,221 @@
 package dev.fincke.hopper.order.order;
 
+import dev.fincke.hopper.order.order.dto.OrderCreateRequest;
+import dev.fincke.hopper.order.order.dto.OrderResponse;
+import dev.fincke.hopper.order.order.dto.OrderStatusUpdateRequest;
+import dev.fincke.hopper.order.order.dto.OrderUpdateRequest;
+import dev.fincke.hopper.order.order.exception.OrderNotFoundException;
+import dev.fincke.hopper.order.order.exception.OrderValidationException;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController
 {
     // * Dependencies
-    // repository to access orders
-    private final OrderRepository repo;
+    // service layer for order business operations
+    private final OrderService orderService;
 
     // * Constructor
-    public OrderController(OrderRepository repo)
+    public OrderController(OrderService orderService)
     {
-        this.repo = repo;
+        this.orderService = orderService;
     }
 
     // * Routes
     // GET /api/orders - list all orders
     @GetMapping
-    public List<OrderDto> list()
+    public List<OrderResponse> list()
     {
-        return repo.findAll().stream()
-                .map(o -> new OrderDto(
-                        o.getId().toString(),
-                        o.getPlatform().getId().toString(),
-                        o.getPlatform().getName(),
-                        o.getExternalOrderId(),
-                        o.getStatus(),
-                        o.getTotalAmount(),
-                        o.getOrderDate()))
-                .collect(Collectors.toList());
+        return orderService.findAll();
     }
 
     // GET /api/orders/{id} - get order by ID
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDto> getById(@PathVariable String id)
+    public ResponseEntity<OrderResponse> getById(@PathVariable String id)
     {
-        try {
+        try
+        {
             UUID orderId = UUID.fromString(id);
-            Optional<Order> order = repo.findById(orderId);
-            
-            if (order.isPresent()) {
-                Order o = order.get();
-                OrderDto dto = new OrderDto(
-                        o.getId().toString(),
-                        o.getPlatform().getId().toString(),
-                        o.getPlatform().getName(),
-                        o.getExternalOrderId(),
-                        o.getStatus(),
-                        o.getTotalAmount(),
-                        o.getOrderDate());
-                return ResponseEntity.ok(dto);
-            }
-            return ResponseEntity.notFound().build();
-        } catch (IllegalArgumentException e) {
+            OrderResponse order = orderService.findById(orderId);
+            return ResponseEntity.ok(order);
+        }
+        catch (IllegalArgumentException e)
+        {
             return ResponseEntity.badRequest().build();
+        }
+        catch (OrderNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
         }
     }
 
     // GET /api/orders/status/{status} - get orders by status
     @GetMapping("/status/{status}")
-    public List<OrderDto> getByStatus(@PathVariable String status)
+    public List<OrderResponse> getByStatus(@PathVariable String status)
     {
-        return repo.findByStatus(status).stream()
-                .map(o -> new OrderDto(
-                        o.getId().toString(),
-                        o.getPlatform().getId().toString(),
-                        o.getPlatform().getName(),
-                        o.getExternalOrderId(),
-                        o.getStatus(),
-                        o.getTotalAmount(),
-                        o.getOrderDate()))
-                .collect(Collectors.toList());
+        return orderService.findByStatus(status);
     }
-
-    // * DTO
-    // Represents an order in API responses
-    static class OrderDto
+    
+    // POST /api/orders - create new order
+    @PostMapping
+    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderCreateRequest request)
     {
-        // order ID
-        private final String id;
-        // platform ID
-        private final String platformId;
-        // platform name
-        private final String platformName;
-        // external order ID
-        private final String externalOrderId;
-        // status of the order
-        private final String status;
-        // total amount
-        private final BigDecimal totalAmount;
-        // order date
-        private final Timestamp orderDate;
-
-        // * Constructor
-        public OrderDto(String id, String platformId, String platformName, String externalOrderId, 
-                       String status, BigDecimal totalAmount, Timestamp orderDate)
+        try
         {
-            this.id = id;
-            this.platformId = platformId;
-            this.platformName = platformName;
-            this.externalOrderId = externalOrderId;
-            this.status = status;
-            this.totalAmount = totalAmount;
-            this.orderDate = orderDate;
+            OrderResponse order = orderService.createOrder(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(order);
         }
-
-        // * Getters (for serialization)
-        // order ID
-        public String getId()
+        catch (OrderValidationException e)
         {
-            return id;
+            return ResponseEntity.badRequest().build();
         }
-
-        // platform ID
-        public String getPlatformId()
+    }
+    
+    // PUT /api/orders/{id} - update existing order
+    @PutMapping("/{id}")
+    public ResponseEntity<OrderResponse> updateOrder(@PathVariable String id, @Valid @RequestBody OrderUpdateRequest request)
+    {
+        try
         {
-            return platformId;
+            UUID orderId = UUID.fromString(id);
+            OrderResponse order = orderService.updateOrder(orderId, request);
+            return ResponseEntity.ok(order);
         }
-
-        // platform name
-        public String getPlatformName()
+        catch (IllegalArgumentException e)
         {
-            return platformName;
+            return ResponseEntity.badRequest().build();
         }
-
-        // external order ID
-        public String getExternalOrderId()
+        catch (OrderNotFoundException e)
         {
-            return externalOrderId;
+            return ResponseEntity.notFound().build();
         }
-
-        // status
-        public String getStatus()
+        catch (OrderValidationException e)
         {
-            return status;
+            return ResponseEntity.badRequest().build();
         }
-
-        // total amount
-        public BigDecimal getTotalAmount()
+    }
+    
+    // PATCH /api/orders/{id}/status - update order status
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<OrderResponse> updateStatus(@PathVariable String id, @Valid @RequestBody OrderStatusUpdateRequest request)
+    {
+        try
         {
-            return totalAmount;
+            UUID orderId = UUID.fromString(id);
+            OrderResponse order = orderService.updateStatus(orderId, request);
+            return ResponseEntity.ok(order);
         }
-
-        // order date
-        public Timestamp getOrderDate()
+        catch (IllegalArgumentException e)
         {
-            return orderDate;
+            return ResponseEntity.badRequest().build();
+        }
+        catch (OrderNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
+    // DELETE /api/orders/{id} - delete order
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable String id)
+    {
+        try
+        {
+            UUID orderId = UUID.fromString(id);
+            orderService.deleteOrder(orderId);
+            return ResponseEntity.noContent().build();
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().build();
+        }
+        catch (OrderNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
+    // GET /api/orders/buyer/{buyerId} - get orders for specific buyer
+    @GetMapping("/buyer/{buyerId}")
+    public ResponseEntity<List<OrderResponse>> getOrdersByBuyer(@PathVariable String buyerId)
+    {
+        try
+        {
+            UUID id = UUID.fromString(buyerId);
+            List<OrderResponse> orders = orderService.findByBuyerId(id);
+            return ResponseEntity.ok(orders);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    // PUT /api/orders/{orderId}/buyer/{buyerId} - assign buyer to order
+    @PutMapping("/{orderId}/buyer/{buyerId}")
+    public ResponseEntity<OrderResponse> assignBuyer(@PathVariable String orderId, @PathVariable String buyerId)
+    {
+        try
+        {
+            UUID orderUuid = UUID.fromString(orderId);
+            UUID buyerUuid = UUID.fromString(buyerId);
+            OrderResponse order = orderService.assignBuyer(orderUuid, buyerUuid);
+            return ResponseEntity.ok(order);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().build();
+        }
+        catch (OrderNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
+    // DELETE /api/orders/{orderId}/buyer - remove buyer from order
+    @DeleteMapping("/{orderId}/buyer")
+    public ResponseEntity<OrderResponse> unassignBuyer(@PathVariable String orderId)
+    {
+        try
+        {
+            UUID orderUuid = UUID.fromString(orderId);
+            OrderResponse order = orderService.unassignBuyer(orderUuid);
+            return ResponseEntity.ok(order);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().build();
+        }
+        catch (OrderNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
+    // PUT /api/orders/{id}/recalculate-total - recalculate order total from items
+    @PutMapping("/{id}/recalculate-total")
+    public ResponseEntity<OrderResponse> recalculateTotal(@PathVariable String id)
+    {
+        try
+        {
+            UUID orderId = UUID.fromString(id);
+            OrderResponse order = orderService.recalculateTotal(orderId);
+            return ResponseEntity.ok(order);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().build();
+        }
+        catch (OrderNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
         }
     }
 }

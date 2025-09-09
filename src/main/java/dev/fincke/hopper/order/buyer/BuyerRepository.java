@@ -9,12 +9,12 @@ import java.util.UUID;
 // Data access layer for Buyer entities (Spring Data JPA)
 public interface BuyerRepository extends JpaRepository<Buyer, UUID>
 {
-    // find buyer by email address
+    // Find buyer by email address
     Buyer findByEmail(String email);
 
-    // find buyers by name (case-insensitive)
+    // Find buyers by name (case-insensitive)
     List<Buyer> findByNameContainingIgnoreCase(String name);
 
-    // check if email exists
+    // Check if email exists
     boolean existsByEmail(String email);
 }
