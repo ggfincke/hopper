@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 2025-09-09
+
+### Added
+- **OrderAddress Service Layer**: Complete business logic implementation with OrderAddressService interface and comprehensive operations
+- **OrderAddress DTOs**: Request/response objects with validation (OrderAddressCreateRequest, OrderAddressUpdateRequest, OrderAddressResponse)  
+- **OrderAddress Exceptions**: Custom exceptions for business operations (OrderAddressNotFoundException, DuplicateOrderAddressException)
+- **Geographic Query Operations**: Service methods for finding addresses by city, state, and postal code
+
+### Changed
+- **OrderAddressController**: Refactored to use service layer pattern with comprehensive REST endpoints
+- **OrderAddressRepository**: Enhanced with query methods for geographic searches and order-based lookups
+
+## [Previous Unreleased]
+
 ### Added
 - **Buyer Service Layer**: Complete business logic implementation with BuyerService interface and CRUD operations
 - **Buyer DTOs**: Request/response objects with validation (BuyerCreateRequest, BuyerUpdateRequest, BuyerResponse)
