@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Complete Service Layer Architecture**: Three-layer architecture (Controller → Service → Repository) for all domain entities (Product, Listing, Buyer, OrderAddress, Order, OrderItem, Platform, PlatformCredential)
-- **Service Layer Business Logic**: Interface-based design with CRUD operations, validation, and domain-specific operations (stock management, status transitions, geographic queries, credential key management)
-- **Comprehensive DTO Pattern**: Request/response objects with validation and normalization for all entities including PlatformCredential DTOs
-- **Domain Exception Handling**: Custom business exceptions (NotFound, Duplicate, Validation, InsufficientStock, InvalidStatus, DuplicateCredentialKey) for all service operations
+- **Complete Service Layer Architecture**: Three-layer architecture (Controller → Service → Repository) for all domain entities (Product, Listing, Buyer, OrderAddress, Order, OrderItem, Platform, PlatformCredential, PlatformFee)
+- **Service Layer Business Logic**: Interface-based design with CRUD operations, validation, and domain-specific operations (stock management, status transitions, geographic queries, credential key management, fee calculations and aggregations)
+- **Comprehensive DTO Pattern**: Request/response objects with validation and normalization for all entities including PlatformFee DTOs with business rule validation
+- **Domain Exception Handling**: Custom business exceptions (NotFound, Duplicate, Validation, InsufficientStock, InvalidStatus, DuplicateCredentialKey, DuplicateFeeType, InvalidFeeAmount, PlatformFeeNotFound) for all service operations
 - **Enhanced Repository Layer**: Business-specific query methods with Optional returns for all entities
 
 ### Changed
