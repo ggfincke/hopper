@@ -106,19 +106,32 @@ public class PlatformFeeController
     {
         List<PlatformFee> fees;
         
-        if (orderId != null && feeType != null) {
+        if (orderId != null && feeType != null)
+        {
             fees = repo.findByOrderIdAndFeeType(orderId, feeType);
-        } else if (orderId != null) {
+        }
+        else if (orderId != null)
+        {
             fees = repo.findByOrderId(orderId);
-        } else if (feeType != null) {
+        }
+        else if (feeType != null)
+        {
             fees = repo.findByFeeType(feeType);
-        } else if (minAmount != null && maxAmount != null) {
+        }
+        else if (minAmount != null && maxAmount != null)
+        {
             fees = repo.findByAmountBetween(minAmount, maxAmount);
-        } else if (minAmount != null) {
+        }
+        else if (minAmount != null)
+        {
             fees = repo.findByAmountGreaterThanEqual(minAmount);
-        } else if (maxAmount != null) {
+        }
+        else if (maxAmount != null)
+        {
             fees = repo.findByAmountLessThanEqual(maxAmount);
-        } else {
+        }
+        else
+        {
             fees = repo.findAll();
         }
 
@@ -138,11 +151,13 @@ public class PlatformFeeController
     @PostMapping
     public ResponseEntity<PlatformFeeDto> create(@RequestBody CreatePlatformFeeRequest request)
     {
-        try {
+        try
+        {
             UUID orderId = UUID.fromString(request.getOrderId());
             Order order = orderRepo.findById(orderId).orElse(null);
             
-            if (order == null) {
+            if (order == null)
+            {
                 return ResponseEntity.badRequest().build();
             }
 
@@ -154,7 +169,9 @@ public class PlatformFeeController
 
             PlatformFee saved = repo.save(fee);
             return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e)
+        {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -163,12 +180,15 @@ public class PlatformFeeController
     public ResponseEntity<PlatformFeeDto> update(@PathVariable UUID id, @RequestBody CreatePlatformFeeRequest request)
     {
         return repo.findById(id)
-                .map(fee -> {
-                    try {
+                .map(fee -> 
+                {
+                    try
+                    {
                         UUID orderId = UUID.fromString(request.getOrderId());
                         Order order = orderRepo.findById(orderId).orElse(null);
                         
-                        if (order == null) {
+                        if (order == null)
+                        {
                             return ResponseEntity.badRequest().<PlatformFeeDto>build();
                         }
 
@@ -178,7 +198,9 @@ public class PlatformFeeController
 
                         PlatformFee saved = repo.save(fee);
                         return ResponseEntity.ok(toDto(saved));
-                    } catch (IllegalArgumentException e) {
+                    }
+                    catch (IllegalArgumentException e)
+                    {
                         return ResponseEntity.badRequest().<PlatformFeeDto>build();
                     }
                 })
@@ -188,10 +210,13 @@ public class PlatformFeeController
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id)
     {
-        if (repo.existsById(id)) {
+        if (repo.existsById(id))
+        {
             repo.deleteById(id);
             return ResponseEntity.noContent().build();
-        } else {
+        }
+        else
+        {
             return ResponseEntity.notFound().build();
         }
     }

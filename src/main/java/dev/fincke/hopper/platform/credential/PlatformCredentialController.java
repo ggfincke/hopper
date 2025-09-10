@@ -128,13 +128,20 @@ public class PlatformCredentialController
     {
         List<PlatformCredential> credentials;
         
-        if (platformId != null && isActive != null) {
+        if (platformId != null && isActive != null)
+        {
             credentials = repo.findByPlatformIdAndIsActive(platformId, isActive);
-        } else if (platformId != null) {
+        }
+        else if (platformId != null)
+        {
             credentials = repo.findByPlatformId(platformId);
-        } else if (isActive != null) {
+        }
+        else if (isActive != null)
+        {
             credentials = repo.findByIsActive(isActive);
-        } else {
+        }
+        else
+        {
             credentials = repo.findAll();
         }
 
@@ -154,11 +161,13 @@ public class PlatformCredentialController
     @PostMapping
     public ResponseEntity<PlatformCredentialDto> create(@RequestBody CreatePlatformCredentialRequest request)
     {
-        try {
+        try
+        {
             UUID platformId = UUID.fromString(request.getPlatformId());
             Platform platform = platformRepo.findById(platformId).orElse(null);
             
-            if (platform == null) {
+            if (platform == null)
+            {
                 return ResponseEntity.badRequest().build();
             }
 
@@ -171,7 +180,9 @@ public class PlatformCredentialController
 
             PlatformCredential saved = repo.save(credential);
             return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e)
+        {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -180,12 +191,15 @@ public class PlatformCredentialController
     public ResponseEntity<PlatformCredentialDto> update(@PathVariable UUID id, @RequestBody CreatePlatformCredentialRequest request)
     {
         return repo.findById(id)
-                .map(credential -> {
-                    try {
+                .map(credential -> 
+                {
+                    try
+                    {
                         UUID platformId = UUID.fromString(request.getPlatformId());
                         Platform platform = platformRepo.findById(platformId).orElse(null);
                         
-                        if (platform == null) {
+                        if (platform == null)
+                        {
                             return ResponseEntity.badRequest().<PlatformCredentialDto>build();
                         }
 
@@ -196,7 +210,9 @@ public class PlatformCredentialController
 
                         PlatformCredential saved = repo.save(credential);
                         return ResponseEntity.ok(toDto(saved));
-                    } catch (IllegalArgumentException e) {
+                    }
+                    catch (IllegalArgumentException e)
+                    {
                         return ResponseEntity.badRequest().<PlatformCredentialDto>build();
                     }
                 })
@@ -206,10 +222,13 @@ public class PlatformCredentialController
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id)
     {
-        if (repo.existsById(id)) {
+        if (repo.existsById(id))
+        {
             repo.deleteById(id);
             return ResponseEntity.noContent().build();
-        } else {
+        }
+        else
+        {
             return ResponseEntity.notFound().build();
         }
     }
