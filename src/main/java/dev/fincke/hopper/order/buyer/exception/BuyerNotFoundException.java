@@ -26,13 +26,13 @@ public class BuyerNotFoundException extends RuntimeException
         this.email = email;
     }
     
-    // buyerId (null if lookup was by email)
+    // Buyer ID (null if lookup was by email)
     public UUID getBuyerId()
     {
         return buyerId;
     }
     
-    // email (null if lookup was by ID)
+    // Email (null if lookup was by ID)
     public String getEmail()
     {
         return email;

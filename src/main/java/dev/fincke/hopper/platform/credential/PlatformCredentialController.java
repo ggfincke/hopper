@@ -1,228 +1,92 @@
 package dev.fincke.hopper.platform.credential;
 
-import dev.fincke.hopper.platform.platform.Platform;
-import dev.fincke.hopper.platform.platform.PlatformRepository;
+import dev.fincke.hopper.platform.credential.dto.PlatformCredentialCreateRequest;
+import dev.fincke.hopper.platform.credential.dto.PlatformCredentialResponse;
+import dev.fincke.hopper.platform.credential.dto.PlatformCredentialUpdateRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-class PlatformCredentialDto
-{
-    private final String id;
-    private final String platformId;
-    private final String platformName;
-    private final String credentialKey;
-    private final String credentialValue;
-    private final Boolean isActive;
-
-    public PlatformCredentialDto(String id, String platformId, String platformName, String credentialKey, String credentialValue, Boolean isActive)
-    {
-        this.id = id;
-        this.platformId = platformId;
-        this.platformName = platformName;
-        this.credentialKey = credentialKey;
-        this.credentialValue = credentialValue;
-        this.isActive = isActive;
-    }
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public String getPlatformId()
-    {
-        return platformId;
-    }
-
-    public String getPlatformName()
-    {
-        return platformName;
-    }
-
-    public String getCredentialKey()
-    {
-        return credentialKey;
-    }
-
-    public String getCredentialValue()
-    {
-        return credentialValue;
-    }
-
-    public Boolean getIsActive()
-    {
-        return isActive;
-    }
-}
-
-class CreatePlatformCredentialRequest
-{
-    private String platformId;
-    private String credentialKey;
-    private String credentialValue;
-    private Boolean isActive = true;
-
-    public String getPlatformId()
-    {
-        return platformId;
-    }
-
-    public void setPlatformId(String platformId)
-    {
-        this.platformId = platformId;
-    }
-
-    public String getCredentialKey()
-    {
-        return credentialKey;
-    }
-
-    public void setCredentialKey(String credentialKey)
-    {
-        this.credentialKey = credentialKey;
-    }
-
-    public String getCredentialValue()
-    {
-        return credentialValue;
-    }
-
-    public void setCredentialValue(String credentialValue)
-    {
-        this.credentialValue = credentialValue;
-    }
-
-    public Boolean getIsActive()
-    {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive)
-    {
-        this.isActive = isActive;
-    }
-}
-
+// REST controller handling platform credential API endpoints
 @RestController
 @RequestMapping("/api/platform-credentials")
 public class PlatformCredentialController
 {
+    // * Dependencies
     
-    private final PlatformCredentialRepository repo;
-    private final PlatformRepository platformRepo;
+    // Spring will inject service dependency
+    private final PlatformCredentialService credentialService;
 
-    public PlatformCredentialController(PlatformCredentialRepository repo, PlatformRepository platformRepo)
+    // * Constructor
+    
+    public PlatformCredentialController(PlatformCredentialService credentialService)
     {
-        this.repo = repo;
-        this.platformRepo = platformRepo;
+        this.credentialService = credentialService;
     }
+    
+    // * Core CRUD Endpoints
 
+    // GET /api/platform-credentials - get all credentials with optional filtering
     @GetMapping
-    public List<PlatformCredentialDto> list(@RequestParam(required = false) UUID platformId, 
-                                           @RequestParam(required = false) Boolean isActive)
+    public List<PlatformCredentialResponse> list(@RequestParam(required = false) UUID platformId, 
+                                                @RequestParam(required = false) Boolean isActive)
     {
-        List<PlatformCredential> credentials;
-        
-        if (platformId != null && isActive != null) {
-            credentials = repo.findByPlatformIdAndIsActive(platformId, isActive);
-        } else if (platformId != null) {
-            credentials = repo.findByPlatformId(platformId);
-        } else if (isActive != null) {
-            credentials = repo.findByIsActive(isActive);
-        } else {
-            credentials = repo.findAll();
-        }
-
-        return credentials.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+        return credentialService.findAll(platformId, isActive);
     }
 
+    // GET /api/platform-credentials/{id} - get credential by ID
     @GetMapping("/{id}")
-    public ResponseEntity<PlatformCredentialDto> getById(@PathVariable UUID id)
+    public PlatformCredentialResponse getById(@PathVariable UUID id)
     {
-        return repo.findById(id)
-                .map(credential -> ResponseEntity.ok(toDto(credential)))
-                .orElse(ResponseEntity.notFound().build());
+        return credentialService.findById(id);
     }
 
+    // POST /api/platform-credentials - create new credential
     @PostMapping
-    public ResponseEntity<PlatformCredentialDto> create(@RequestBody CreatePlatformCredentialRequest request)
+    public ResponseEntity<PlatformCredentialResponse> create(@Valid @RequestBody PlatformCredentialCreateRequest request)
     {
-        try {
-            UUID platformId = UUID.fromString(request.getPlatformId());
-            Platform platform = platformRepo.findById(platformId).orElse(null);
-            
-            if (platform == null) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            PlatformCredential credential = new PlatformCredential(
-                platform,
-                request.getCredentialKey(),
-                request.getCredentialValue(),
-                request.getIsActive()
-            );
-
-            PlatformCredential saved = repo.save(credential);
-            return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        PlatformCredentialResponse response = credentialService.createCredential(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // PUT /api/platform-credentials/{id} - update existing credential
     @PutMapping("/{id}")
-    public ResponseEntity<PlatformCredentialDto> update(@PathVariable UUID id, @RequestBody CreatePlatformCredentialRequest request)
+    public PlatformCredentialResponse update(@PathVariable UUID id, @Valid @RequestBody PlatformCredentialUpdateRequest request)
     {
-        return repo.findById(id)
-                .map(credential -> {
-                    try {
-                        UUID platformId = UUID.fromString(request.getPlatformId());
-                        Platform platform = platformRepo.findById(platformId).orElse(null);
-                        
-                        if (platform == null) {
-                            return ResponseEntity.badRequest().<PlatformCredentialDto>build();
-                        }
-
-                        credential.setPlatform(platform);
-                        credential.setCredentialKey(request.getCredentialKey());
-                        credential.setCredentialValue(request.getCredentialValue());
-                        credential.setIsActive(request.getIsActive());
-
-                        PlatformCredential saved = repo.save(credential);
-                        return ResponseEntity.ok(toDto(saved));
-                    } catch (IllegalArgumentException e) {
-                        return ResponseEntity.badRequest().<PlatformCredentialDto>build();
-                    }
-                })
-                .orElse(ResponseEntity.notFound().build());
+        return credentialService.updateCredential(id, request);
     }
 
+    // DELETE /api/platform-credentials/{id} - delete credential
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id)
     {
-        if (repo.existsById(id)) {
-            repo.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        credentialService.deleteCredential(id);
+        return ResponseEntity.noContent().build();
     }
-
-    private PlatformCredentialDto toDto(PlatformCredential credential)
+    
+    // * Query Endpoints
+    
+    // GET /api/platform-credentials?platformName={name} - find credentials by platform name
+    @GetMapping(params = "platformName")
+    public List<PlatformCredentialResponse> getByPlatformName(@RequestParam String platformName,
+                                                            @RequestParam(required = false) Boolean isActive)
     {
-        return new PlatformCredentialDto(
-            credential.getId().toString(),
-            credential.getPlatform().getId().toString(),
-            credential.getPlatform().getName(),
-            credential.getCredentialKey(),
-            "***REDACTED***", // never expose credential values in API responses
-            credential.getIsActive()
-        );
+        if (isActive != null) 
+        {
+            return credentialService.findByPlatformNameAndIsActive(platformName, isActive);
+        }
+        return credentialService.findByPlatformName(platformName);
+    }
+    
+    // GET /api/platform-credentials/by-key?platformId={id}&credentialKey={key} - find credential by platform and key
+    @GetMapping("/by-key")
+    public PlatformCredentialResponse getByPlatformAndKey(@RequestParam UUID platformId,
+                                                        @RequestParam String credentialKey)
+    {
+        return credentialService.findByPlatformIdAndCredentialKey(platformId, credentialKey);
     }
 }

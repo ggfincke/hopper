@@ -1,61 +1,85 @@
 package dev.fincke.hopper.platform.platform;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import dev.fincke.hopper.platform.platform.dto.PlatformCreateRequest;
+import dev.fincke.hopper.platform.platform.dto.PlatformResponse;
+import dev.fincke.hopper.platform.platform.dto.PlatformUpdateRequest;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
-class PlatformDto
-{
-    private final String id;
-    private final String name;
-    private final String platformType;
-
-    public PlatformDto(String id, String name, String platformType)
-    {
-        this.id = id;
-        this.name = name;
-        this.platformType = platformType;
-    }
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public String getPlatformType()
-    {
-        return platformType;
-    }
-}
-
+// REST controller handling platform API endpoints
 @RestController
 @RequestMapping("/api/platforms")
 public class PlatformController
 {
+    // * Dependencies
     
-    private final PlatformRepository repo;
+    // Spring will inject service dependency
+    private final PlatformService platformService;
 
-    public PlatformController(PlatformRepository repo)
+    // * Constructor
+    
+    public PlatformController(PlatformService platformService)
     {
-        this.repo = repo;
+        this.platformService = platformService;
     }
 
-    @GetMapping
-    public List<PlatformDto> list()
+    // * Core CRUD Endpoints
+    
+    // POST /api/platforms - create new platform
+    @PostMapping
+    public ResponseEntity<PlatformResponse> createPlatform(@Valid @RequestBody PlatformCreateRequest request)
     {
-        return repo.findAll().stream()
-                .map(platform -> new PlatformDto(
-                    platform.getId().toString(),
-                    platform.getName(),
-                    platform.getPlatformType()))
-                .collect(Collectors.toList());
+        PlatformResponse response = platformService.createPlatform(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    // PUT /api/platforms/{id} - update existing platform
+    @PutMapping("/{id}")
+    public PlatformResponse updatePlatform(@PathVariable UUID id, @Valid @RequestBody PlatformUpdateRequest request)
+    {
+        return platformService.updatePlatform(id, request);
+    }
+    
+    // GET /api/platforms/{id} - get platform by ID
+    @GetMapping("/{id}")
+    public PlatformResponse getById(@PathVariable UUID id)
+    {
+        return platformService.findById(id);
+    }
+    
+    // GET /api/platforms - get all platforms
+    @GetMapping
+    public List<PlatformResponse> getAllPlatforms()
+    {
+        return platformService.findAll();
+    }
+    
+    // DELETE /api/platforms/{id} - delete platform
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePlatform(@PathVariable UUID id)
+    {
+        platformService.deletePlatform(id);
+        return ResponseEntity.noContent().build();
+    }
+    
+    // * Query Endpoints
+    
+    // GET /api/platforms?platformType={type} - find platforms by type
+    @GetMapping(params = "platformType")
+    public List<PlatformResponse> getByPlatformType(@RequestParam String platformType)
+    {
+        return platformService.findByPlatformType(platformType);
+    }
+    
+    // GET /api/platforms?name={name} - find platform by name
+    @GetMapping(params = "name")
+    public PlatformResponse getByName(@RequestParam String name)
+    {
+        return platformService.findByName(name);
     }
 }

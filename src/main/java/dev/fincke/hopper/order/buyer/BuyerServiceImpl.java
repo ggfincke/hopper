@@ -64,20 +64,20 @@ public class BuyerServiceImpl implements BuyerService
     public BuyerResponse updateBuyer(UUID id, BuyerUpdateRequest request)
     {
         
-        // find existing buyer
+        // Find existing buyer
         Buyer buyer = buyerRepository.findById(id)
             .orElseThrow(() -> new BuyerNotFoundException(id));
         
-        // validate that at least one field is provided for update
+        // Validate that at least one field is provided for update
         if (!request.hasUpdates())
         {
             throw new IllegalArgumentException("At least one field must be provided for update");
         }
         
-        // update email if provided and different
+        // Update email if provided and different
         if (request.email() != null && !request.email().equals(buyer.getEmail()))
         {
-            // check for email uniqueness
+            // Check for email uniqueness
             if (buyerRepository.existsByEmail(request.email()))
             {
                 throw new DuplicateEmailException(request.email());
@@ -85,7 +85,7 @@ public class BuyerServiceImpl implements BuyerService
             buyer.setEmail(request.email());
         }
         
-        // update name if provided
+        // Update name if provided
         if (request.name() != null)
         {
             buyer.setName(request.name());
@@ -188,7 +188,7 @@ public class BuyerServiceImpl implements BuyerService
             throw new BuyerNotFoundException(id);
         }
         
-        // additional validation logic can be added here
+        // Additional validation logic can be added here
         // such as checking for active orders, payment methods, etc.
     }
     
@@ -203,13 +203,13 @@ public class BuyerServiceImpl implements BuyerService
         
         String trimmedEmail = email.trim();
         
-        // basic length check
+        // Basic length check
         if (trimmedEmail.length() > 254)
         {
             return false;
         }
         
-        // pattern matching for email format
+        // Pattern matching for email format
         return EMAIL_PATTERN.matcher(trimmedEmail).matches();
     }
 }

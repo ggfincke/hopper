@@ -52,37 +52,37 @@ public class Buyer
 
     // * Getters and Setters
     
-    // buyer ID
+    // Buyer ID
     public UUID getId()
     {
         return id;
     }
 
-    // buyer ID (primarily used by JPA)
+    // Buyer ID (primarily used by JPA)
     public void setId(UUID id)
     {
         this.id = id;
     }
 
-    // email
+    // Email
     public String getEmail()
     {
         return email;
     }
 
-    // email (normalized to lowercase on set)
+    // Email (normalized to lowercase on set)
     public void setEmail(String email)
     {
         this.email = email == null ? null : email.trim().toLowerCase();
     }
 
-    // name
+    // Name
     public String getName()
     {
         return name;
     }
 
-    // name (trims whitespace on set)
+    // Name (trims whitespace on set)
     public void setName(String name)
     {
         this.name = name == null ? null : name.trim();

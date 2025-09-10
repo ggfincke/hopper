@@ -1,200 +1,120 @@
 package dev.fincke.hopper.order.address;
 
+import dev.fincke.hopper.order.address.dto.OrderAddressCreateRequest;
+import dev.fincke.hopper.order.address.dto.OrderAddressResponse;
+import dev.fincke.hopper.order.address.dto.OrderAddressUpdateRequest;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+// REST controller handling order address API endpoints
 @RestController
 @RequestMapping("/api/order-addresses")
 public class OrderAddressController
 {
+    
     // * Dependencies
-    // repository to access order addresses
-    private final OrderAddressRepository repo;
-
+    
+    // Spring will inject service dependency
+    private final OrderAddressService orderAddressService;
+    
     // * Constructor
-    public OrderAddressController(OrderAddressRepository repo)
+    
+    // Constructor injection for OrderAddressService
+    public OrderAddressController(OrderAddressService orderAddressService)
     {
-        this.repo = repo;
+        this.orderAddressService = orderAddressService;
     }
 
-    // * Routes
+    // * Core CRUD Endpoints
+    
+    // POST /api/order-addresses - create new address
+    @PostMapping
+    public ResponseEntity<OrderAddressResponse> createOrderAddress(@Valid @RequestBody OrderAddressCreateRequest request)
+    {
+        OrderAddressResponse response = orderAddressService.createOrderAddress(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    // PUT /api/order-addresses/{id} - update existing address
+    @PutMapping("/{id}")
+    public OrderAddressResponse updateOrderAddress(@PathVariable UUID id, @Valid @RequestBody OrderAddressUpdateRequest request)
+    {
+        return orderAddressService.updateOrderAddress(id, request);
+    }
+    
     // GET /api/order-addresses - list all order addresses
     @GetMapping
-    public List<OrderAddressDto> list()
+    public List<OrderAddressResponse> getAllOrderAddresses()
     {
-        return repo.findAll().stream()
-                .map(oa -> new OrderAddressDto(
-                        oa.getId().toString(),
-                        oa.getOrder().getId().toString(),
-                        oa.getStreet(),
-                        oa.getCity(),
-                        oa.getState(),
-                        oa.getPostalCode(),
-                        oa.getCountry()))
-                .collect(Collectors.toList());
+        return orderAddressService.findAll();
     }
 
     // GET /api/order-addresses/{id} - get order address by ID
     @GetMapping("/{id}")
-    public ResponseEntity<OrderAddressDto> getById(@PathVariable String id)
+    public OrderAddressResponse getById(@PathVariable UUID id)
     {
-        try {
-            UUID addressId = UUID.fromString(id);
-            Optional<OrderAddress> orderAddress = repo.findById(addressId);
-            
-            if (orderAddress.isPresent()) {
-                OrderAddress oa = orderAddress.get();
-                OrderAddressDto dto = new OrderAddressDto(
-                        oa.getId().toString(),
-                        oa.getOrder().getId().toString(),
-                        oa.getStreet(),
-                        oa.getCity(),
-                        oa.getState(),
-                        oa.getPostalCode(),
-                        oa.getCountry());
-                return ResponseEntity.ok(dto);
-            }
-            return ResponseEntity.notFound().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return orderAddressService.findById(id);
+    }
+    
+    // DELETE /api/order-addresses/{id} - delete address
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrderAddress(@PathVariable UUID id)
+    {
+        orderAddressService.deleteOrderAddress(id);
+        return ResponseEntity.noContent().build();
     }
 
+    // * Query Endpoints
+    
     // GET /api/order-addresses/order/{orderId} - get address for an order
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<OrderAddressDto> getByOrderId(@PathVariable String orderId)
+    public OrderAddressResponse getByOrderId(@PathVariable UUID orderId)
     {
-        try {
-            UUID orderUuid = UUID.fromString(orderId);
-            OrderAddress orderAddress = repo.findByOrderId(orderUuid);
-            
-            if (orderAddress != null) {
-                OrderAddressDto dto = new OrderAddressDto(
-                        orderAddress.getId().toString(),
-                        orderAddress.getOrder().getId().toString(),
-                        orderAddress.getStreet(),
-                        orderAddress.getCity(),
-                        orderAddress.getState(),
-                        orderAddress.getPostalCode(),
-                        orderAddress.getCountry());
-                return ResponseEntity.ok(dto);
-            }
-            return ResponseEntity.notFound().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return orderAddressService.findByOrderId(orderId);
     }
 
     // GET /api/order-addresses/city/{city} - get addresses by city
     @GetMapping("/city/{city}")
-    public List<OrderAddressDto> getByCity(@PathVariable String city)
+    public List<OrderAddressResponse> getByCity(@PathVariable String city)
     {
-        return repo.findByCity(city).stream()
-                .map(oa -> new OrderAddressDto(
-                        oa.getId().toString(),
-                        oa.getOrder().getId().toString(),
-                        oa.getStreet(),
-                        oa.getCity(),
-                        oa.getState(),
-                        oa.getPostalCode(),
-                        oa.getCountry()))
-                .collect(Collectors.toList());
+        return orderAddressService.findByCity(city);
     }
 
-    // GET /api/order-addresses/country/{country} - get addresses by country
-    @GetMapping("/country/{country}")
-    public List<OrderAddressDto> getByCountry(@PathVariable String country)
+    // GET /api/order-addresses/state/{state} - get addresses by state
+    @GetMapping("/state/{state}")
+    public List<OrderAddressResponse> getByState(@PathVariable String state)
     {
-        return repo.findByCountry(country.toUpperCase()).stream()
-                .map(oa -> new OrderAddressDto(
-                        oa.getId().toString(),
-                        oa.getOrder().getId().toString(),
-                        oa.getStreet(),
-                        oa.getCity(),
-                        oa.getState(),
-                        oa.getPostalCode(),
-                        oa.getCountry()))
-                .collect(Collectors.toList());
+        return orderAddressService.findByState(state);
     }
-
-    // * DTO
-    // Represents an order address in API responses
-    static class OrderAddressDto
+    
+    
+    // GET /api/order-addresses/postal/{postalCode} - get addresses by postal code
+    @GetMapping("/postal/{postalCode}")
+    public List<OrderAddressResponse> getByPostalCode(@PathVariable String postalCode)
     {
-        // order address ID
-        private final String id;
-        // order ID
-        private final String orderId;
-        // street address
-        private final String street;
-        // city name
-        private final String city;
-        // state/region/province
-        private final String state;
-        // postal/zip code
-        private final String postalCode;
-        // country code
-        private final String country;
-
-        // * Constructor
-        public OrderAddressDto(String id, String orderId, String street, String city,
-                              String state, String postalCode, String country)
-        {
-            this.id = id;
-            this.orderId = orderId;
-            this.street = street;
-            this.city = city;
-            this.state = state;
-            this.postalCode = postalCode;
-            this.country = country;
-        }
-
-        // * Getters (for serialization)
-        // order address ID
-        public String getId()
-        {
-            return id;
-        }
-
-        // order ID
-        public String getOrderId()
-        {
-            return orderId;
-        }
-
-        // street
-        public String getStreet()
-        {
-            return street;
-        }
-
-        // city
-        public String getCity()
-        {
-            return city;
-        }
-
-        // state
-        public String getState()
-        {
-            return state;
-        }
-
-        // postal code
-        public String getPostalCode()
-        {
-            return postalCode;
-        }
-
-        // country
-        public String getCountry()
-        {
-            return country;
-        }
+        return orderAddressService.findByPostalCode(postalCode);
+    }
+    
+    // * Utility Endpoints
+    
+    // GET /api/order-addresses/exists/order/{orderId} - check if address exists for order
+    @GetMapping("/exists/order/{orderId}")
+    public ResponseEntity<Boolean> existsByOrderId(@PathVariable UUID orderId)
+    {
+        boolean exists = orderAddressService.existsByOrderId(orderId);
+        return ResponseEntity.ok(exists);
+    }
+    
+    // POST /api/order-addresses/{id}/validate - validate address data
+    @PostMapping("/{id}/validate")
+    public ResponseEntity<Void> validateAddress(@PathVariable UUID id)
+    {
+        orderAddressService.validateAddress(id);
+        return ResponseEntity.ok().build();
     }
 }

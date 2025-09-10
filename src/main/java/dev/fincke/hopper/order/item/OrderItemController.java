@@ -1,156 +1,156 @@
 package dev.fincke.hopper.order.item;
 
+import dev.fincke.hopper.order.item.dto.OrderItemCreateRequest;
+import dev.fincke.hopper.order.item.dto.OrderItemResponse;
+import dev.fincke.hopper.order.item.dto.OrderItemUpdateRequest;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/order-items")
 public class OrderItemController
 {
     // * Dependencies
-    // repository to access order items
-    private final OrderItemRepository repo;
+    // service for order item business operations
+    private final OrderItemService orderItemService;
 
     // * Constructor
-    public OrderItemController(OrderItemRepository repo)
+    public OrderItemController(OrderItemService orderItemService)
     {
-        this.repo = repo;
+        this.orderItemService = orderItemService;
     }
 
     // * Routes
     // GET /api/order-items - list all order items
     @GetMapping
-    public List<OrderItemDto> list()
+    public List<OrderItemResponse> list()
     {
-        return repo.findAll().stream()
-                .map(oi -> new OrderItemDto(
-                        oi.getId().toString(),
-                        oi.getOrder().getId().toString(),
-                        oi.getListing().getId().toString(),
-                        oi.getListing().getExternalListingId(),
-                        oi.getQuantity(),
-                        oi.getPrice()))
-                .collect(Collectors.toList());
+        return orderItemService.findAll();
     }
 
     // GET /api/order-items/{id} - get order item by ID
     @GetMapping("/{id}")
-    public ResponseEntity<OrderItemDto> getById(@PathVariable String id)
+    public ResponseEntity<OrderItemResponse> getById(@PathVariable String id)
     {
-        try {
+        try
+        {
             UUID itemId = UUID.fromString(id);
-            Optional<OrderItem> orderItem = repo.findById(itemId);
-            
-            if (orderItem.isPresent()) {
-                OrderItem oi = orderItem.get();
-                OrderItemDto dto = new OrderItemDto(
-                        oi.getId().toString(),
-                        oi.getOrder().getId().toString(),
-                        oi.getListing().getId().toString(),
-                        oi.getListing().getExternalListingId(),
-                        oi.getQuantity(),
-                        oi.getPrice());
-                return ResponseEntity.ok(dto);
-            }
-            return ResponseEntity.notFound().build();
-        } catch (IllegalArgumentException e) {
+            OrderItemResponse orderItem = orderItemService.findById(itemId);
+            return ResponseEntity.ok(orderItem);
+        }
+        catch (IllegalArgumentException e)
+        {
             return ResponseEntity.badRequest().build();
+        }
+        catch (RuntimeException e)
+        {
+            return ResponseEntity.notFound().build();
         }
     }
 
     // GET /api/order-items/order/{orderId} - get all items for an order
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<List<OrderItemDto>> getByOrderId(@PathVariable String orderId)
+    public ResponseEntity<List<OrderItemResponse>> getByOrderId(@PathVariable String orderId)
     {
-        try {
+        try
+        {
             UUID orderUuid = UUID.fromString(orderId);
-            List<OrderItem> items = repo.findByOrderId(orderUuid);
-            
-            List<OrderItemDto> dtos = items.stream()
-                    .map(oi -> new OrderItemDto(
-                            oi.getId().toString(),
-                            oi.getOrder().getId().toString(),
-                            oi.getListing().getId().toString(),
-                            oi.getListing().getExternalListingId(),
-                            oi.getQuantity(),
-                            oi.getPrice()))
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(dtos);
-        } catch (IllegalArgumentException e) {
+            List<OrderItemResponse> items = orderItemService.findByOrderId(orderUuid);
+            return ResponseEntity.ok(items);
+        }
+        catch (IllegalArgumentException e)
+        {
             return ResponseEntity.badRequest().build();
         }
+        catch (RuntimeException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
     }
-
-    // * DTO
-    // Represents an order item in API responses
-    static class OrderItemDto
+    
+    // POST /api/order-items - create new order item
+    @PostMapping
+    public ResponseEntity<OrderItemResponse> create(@Valid @RequestBody OrderItemCreateRequest request)
     {
-        // order item ID
-        private final String id;
-        // order ID
-        private final String orderId;
-        // listing ID
-        private final String listingId;
-        // external listing ID for reference
-        private final String externalListingId;
-        // quantity purchased
-        private final int quantity;
-        // unit price at time of sale
-        private final BigDecimal price;
-
-        // * Constructor
-        public OrderItemDto(String id, String orderId, String listingId, String externalListingId,
-                           int quantity, BigDecimal price)
+        try
         {
-            this.id = id;
-            this.orderId = orderId;
-            this.listingId = listingId;
-            this.externalListingId = externalListingId;
-            this.quantity = quantity;
-            this.price = price;
+            OrderItemResponse orderItem = orderItemService.createOrderItem(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(orderItem);
         }
-
-        // * Getters (for serialization)
-        // order item ID
-        public String getId()
+        catch (IllegalArgumentException e)
         {
-            return id;
+            return ResponseEntity.badRequest().build();
         }
-
-        // order ID
-        public String getOrderId()
+        catch (RuntimeException e)
         {
-            return orderId;
+            return ResponseEntity.notFound().build();
         }
-
-        // listing ID
-        public String getListingId()
+    }
+    
+    // PUT /api/order-items/{id} - update existing order item
+    @PutMapping("/{id}")
+    public ResponseEntity<OrderItemResponse> update(@PathVariable String id, 
+                                                   @Valid @RequestBody OrderItemUpdateRequest request)
+    {
+        try
         {
-            return listingId;
+            UUID itemId = UUID.fromString(id);
+            OrderItemResponse orderItem = orderItemService.updateOrderItem(itemId, request);
+            return ResponseEntity.ok(orderItem);
         }
-
-        // external listing ID
-        public String getExternalListingId()
+        catch (IllegalArgumentException e)
         {
-            return externalListingId;
+            return ResponseEntity.badRequest().build();
         }
-
-        // quantity
-        public int getQuantity()
+        catch (RuntimeException e)
         {
-            return quantity;
+            return ResponseEntity.notFound().build();
         }
-
-        // price
-        public BigDecimal getPrice()
+    }
+    
+    // DELETE /api/order-items/{id} - delete order item
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id)
+    {
+        try
         {
-            return price;
+            UUID itemId = UUID.fromString(id);
+            orderItemService.deleteOrderItem(itemId);
+            return ResponseEntity.noContent().build();
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().build();
+        }
+        catch (RuntimeException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
+    // GET /api/order-items/{id}/line-total - calculate line total for order item
+    @GetMapping("/{id}/line-total")
+    public ResponseEntity<BigDecimal> getLineTotal(@PathVariable String id)
+    {
+        try
+        {
+            UUID itemId = UUID.fromString(id);
+            BigDecimal lineTotal = orderItemService.calculateLineTotal(itemId);
+            return ResponseEntity.ok(lineTotal);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().build();
+        }
+        catch (RuntimeException e)
+        {
+            return ResponseEntity.notFound().build();
         }
     }
 }
