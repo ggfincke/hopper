@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 2025-09-10
+
+### Added
+- **User Management System**: Complete authentication and authorization implementation with User and Role entities, BCrypt password encoding, account locking, and comprehensive service layer
+- **Database Schema for RBAC**: User authentication tables (users, roles, user_roles) with proper indexes, constraints, and predefined system roles (ADMIN, USER, API_CLIENT)
+- **User REST API**: CRUD endpoints for user operations including password change, role assignment, account enable/disable, and search functionality
+
+## 2025-09-09 
+
 ### Added
 - **Complete Service Layer Architecture**: Three-layer architecture (Controller → Service → Repository) for all domain entities (Product, Listing, Buyer, OrderAddress, Order, OrderItem, Platform, PlatformCredential, PlatformFee)
 - **Service Layer Business Logic**: Interface-based design with CRUD operations, validation, and domain-specific operations (stock management, status transitions, geographic queries, credential key management, fee calculations and aggregations)
