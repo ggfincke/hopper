@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Database Schema for RBAC**: User authentication tables (users, roles, user_roles) with proper indexes, constraints, and predefined system roles (ADMIN, USER, API_CLIENT)
 - **User REST API**: CRUD endpoints for user operations including password change, role assignment, account enable/disable, and search functionality
 - **JWT Dependencies**: Added JJWT library dependencies for token-based authentication including API, implementation, and Jackson binding modules
+- **JWT Configuration Properties**: Added JWT configuration settings across all application profiles including token expiration, issuer, audience, and security settings
 
 ## 2025-09-09 
 
