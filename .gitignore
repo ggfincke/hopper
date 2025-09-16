@@ -43,3 +43,5 @@ out/
 ### Claude ###
 .claude
 CLAUDE.md
+
+dev-docs/
