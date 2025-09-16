@@ -65,7 +65,8 @@ public class OrderAddressServiceImpl implements OrderAddressService
             request.street(),
             request.city(), 
             request.state(),
-            request.postalCode()
+            request.postalCode(),
+            request.country()
         );
         
         // Save and return response DTO
@@ -117,6 +118,12 @@ public class OrderAddressServiceImpl implements OrderAddressService
             {
                 throw new IllegalArgumentException("Invalid US postal code format");
             }
+        }
+
+        // Update country if provided
+        if (request.country() != null)
+        {
+            orderAddress.setCountry(request.country());
         }
         
         OrderAddress savedAddress = orderAddressRepository.save(orderAddress);

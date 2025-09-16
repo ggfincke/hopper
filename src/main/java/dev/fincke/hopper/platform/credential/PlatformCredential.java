@@ -45,7 +45,7 @@ public class PlatformCredential
 
     // whether this credential is currently active
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private boolean isActive = true;
 
     // * Constructors
 
@@ -64,7 +64,7 @@ public class PlatformCredential
         this.platform = platform;
         this.credentialKey = credentialKey;
         this.credentialValue = credentialValue;
-        this.isActive = isActive;
+        this.isActive = isActive == null || isActive;
     }
 
     // * Getters and Setters
@@ -109,12 +109,22 @@ public class PlatformCredential
         this.credentialValue = credentialValue;
     }
 
-    public Boolean getIsActive() 
+    public boolean isActive()
     {
         return isActive;
     }
 
-    public void setIsActive(Boolean isActive) 
+    public boolean getIsActive()
+    {
+        return isActive;
+    }
+
+    public void setActive(boolean active)
+    {
+        this.isActive = active;
+    }
+
+    public void setIsActive(boolean isActive)
     {
         this.isActive = isActive;
     }

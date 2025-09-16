@@ -122,7 +122,7 @@ External marketplaces or channels where products are listed and orders originate
 |---------------|--------|-------------|-------|
 | id            | uuid   | PK          | |
 | name          | string | UK          | Human-readable name (e.g., "eBay", "Etsy") |
-| platform_type | string | IDX         | Free-form or enum-like type label; indexed in code |
+| platform_type | string | NN, IDX     | Free-form or enum-like type label; indexed in code |
 
 Relationships: one Platform has many Listings, Orders, and Platform_Credentials.
 
@@ -137,7 +137,7 @@ Secrets or configuration needed to connect to a Platform.
 | platform_id     | uuid    | FK          | References Platforms.id |
 | credential_key  | string  |             | Key/name of the credential (e.g., "API_KEY") |
 | credential_value| string  |             | Secret or value |
-| is_active       | boolean |             | Toggle for rotation or deprecation |
+| is_active       | boolean | NN          | Toggle for rotation or deprecation |
 
 Recommended: unique `(platform_id, credential_key)` to avoid duplicates.
 
@@ -167,6 +167,7 @@ Orders received on a Platform.
 |-------------------|-----------|-------------|-------|
 | id                | uuid      | PK          | |
 | platform_id       | uuid      | FK          | References Platforms.id |
+| buyer_id          | uuid      | FK (nullable) | References Buyers.id |
 | external_order_id | string    |             | Identifier on the external platform |
 | status            | string    |             | e.g., pending, paid, shipped, cancelled |
 | total_amount      | decimal   |             | Order total amount |
@@ -195,8 +196,8 @@ Customer information associated with orders.
 | Column | Type   | Constraints | Notes |
 |--------|--------|-------------|-------|
 | id     | uuid   | PK          | |
-| email  | string |             | Email address |
-| name   | string |             | Display/full name |
+| email  | string | UK (nullable) | Email address |
+| name   | string | NN          | Display/full name |
 
 Relationship: a Buyer may place many Orders; an Order belongs to one Buyer (optionally, if provided by the platform).
 

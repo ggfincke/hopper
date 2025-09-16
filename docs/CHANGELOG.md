@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 2025-09-16
+
+### Changed
+- **Data Model Improvements**: Enhanced null safety and validation across entities
+  - Product: Made SKU nullable with trimming, Buyer: unique email constraint
+  - OrderAddress: Added country field, removed redundant index
+  - PlatformCredential: Changed to primitive boolean with convenience methods
+- **Schema Updates**: Added NOT NULL constraints and foreign key relationships
+
+### Fixed
+- Removed duplicate index on order_addresses.order_id
+
 ## 2025-09-10
 
 ### Added

@@ -98,7 +98,7 @@ public class PlatformCredentialServiceImpl implements PlatformCredentialService
         
         if (request.isActive() != null) 
         {
-            credential.setIsActive(request.isActive());
+            credential.setActive(request.isActive());
         }
         
         PlatformCredential savedCredential = credentialRepository.save(credential);

@@ -22,7 +22,7 @@ public record PlatformCredentialResponse(
     String credentialValue,
     
     // whether this credential is active
-    Boolean isActive
+    boolean isActive
 ) 
 {
     // * Static Factory Methods
@@ -36,7 +36,7 @@ public record PlatformCredentialResponse(
             credential.getPlatform().getName(),
             credential.getCredentialKey(),
             "***REDACTED***", // never expose credential values in API responses
-            credential.getIsActive()
+            credential.isActive()
         );
     }
 }

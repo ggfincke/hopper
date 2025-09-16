@@ -29,11 +29,15 @@ public record OrderAddressCreateRequest(
     // Postal/zip code (required, US ZIP code format validation)
     @NotBlank(message = "Postal code is required")
     @Pattern(regexp = "^\\d{5}(-\\d{4})?$", message = "Postal code must be a valid US ZIP code (XXXXX or XXXXX-XXXX)")
-    String postalCode
-    
+    String postalCode,
+
+    // Country (required, expects ISO code or name)
+    @NotBlank(message = "Country is required")
+    String country
+
 )
 {
-    
+
     // Compact constructor normalizes data (trims whitespace, standardizes formats)
     public OrderAddressCreateRequest
     {
@@ -43,5 +47,6 @@ public record OrderAddressCreateRequest(
         state = state != null ? state.trim() : state;
         // Remove extra spaces and normalize postal code format
         postalCode = postalCode != null ? postalCode.trim().replaceAll("\\s+", "") : postalCode;
+        country = country != null ? country.trim() : country;
     }
 }
