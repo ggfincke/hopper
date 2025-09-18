@@ -8,6 +8,10 @@ import dev.fincke.hopper.platform.credential.exception.PlatformCredentialNotFoun
 import dev.fincke.hopper.platform.platform.Platform;
 import dev.fincke.hopper.platform.platform.PlatformRepository;
 import dev.fincke.hopper.platform.platform.exception.PlatformNotFoundException;
+import dev.fincke.hopper.security.encryption.CredentialEncryptionService;
+import dev.fincke.hopper.security.encryption.EncryptedCredential;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,24 +20,29 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-// Service implementation for platform credential business operations
+// Implements platform credential workflows, including encryption-aware helpers
 @Service
 @Transactional(readOnly = true) // default to read-only transactions for better performance
 public class PlatformCredentialServiceImpl implements PlatformCredentialService 
 {
     // * Dependencies
     
-    // Spring will inject repository dependencies
+    private static final Logger logger = LoggerFactory.getLogger(PlatformCredentialServiceImpl.class);
+    
+    // Spring injects these collaborators so the service can persist and look up credentials
     private final PlatformCredentialRepository credentialRepository;
     private final PlatformRepository platformRepository;
+    private final CredentialEncryptionService encryptionService;
     
     // * Constructor
     
     public PlatformCredentialServiceImpl(PlatformCredentialRepository credentialRepository, 
-                                       PlatformRepository platformRepository) 
+                                       PlatformRepository platformRepository,
+                                       CredentialEncryptionService encryptionService) 
     {
         this.credentialRepository = credentialRepository;
         this.platformRepository = platformRepository;
+        this.encryptionService = encryptionService;
     }
     
     // * Core CRUD Operations
@@ -42,7 +51,7 @@ public class PlatformCredentialServiceImpl implements PlatformCredentialService
     @Transactional // write operation requires full transaction
     public PlatformCredentialResponse createCredential(PlatformCredentialCreateRequest request) 
     {
-        // validate platform exists
+        // Ensure the parent platform exists before attaching credentials
         Platform platform = platformRepository.findById(request.platformId())
             .orElseThrow(() -> new PlatformNotFoundException(request.platformId()));
         
@@ -78,7 +87,7 @@ public class PlatformCredentialServiceImpl implements PlatformCredentialService
             throw new IllegalArgumentException("At least one field must be provided for update");
         }
         
-        // update credential key if changed (check for duplicate)
+        // Enforce unique keys when renaming so each platform keeps one secret per key label
         if (request.credentialKey() != null && !request.credentialKey().equals(credential.getCredentialKey())) 
         {
             Optional<PlatformCredential> existingCredential = credentialRepository
@@ -192,6 +201,128 @@ public class PlatformCredentialServiceImpl implements PlatformCredentialService
     public List<PlatformCredentialResponse> findByPlatformNameAndIsActive(String platformName, Boolean isActive) 
     {
         return credentialRepository.findByPlatformNameAndIsActive(platformName.trim(), isActive).stream()
+            .map(PlatformCredentialResponse::from)
+            .collect(Collectors.toList());
+    }
+    
+    // * Secure Credential Operations
+    
+    @Override
+    public String getDecryptedCredentialValue(UUID credentialId) 
+    {
+        PlatformCredential credential = credentialRepository.findById(credentialId)
+            .orElseThrow(() -> new PlatformCredentialNotFoundException(credentialId));
+        
+        // Skip decryption when legacy records are still stored in plaintext
+        if (!credential.isEncrypted()) 
+        {
+            logger.warn("Credential {} is not encrypted - returning as-is", credentialId);
+            return credential.getCredentialValue();
+        }
+        
+        // Rehydrate persisted metadata so the encryption service can verify integrity
+        EncryptedCredential encryptedCredential = credential.toEncryptedCredential();
+        if (encryptedCredential == null) 
+        {
+            throw new IllegalStateException("Invalid encryption metadata for credential: " + credentialId);
+        }
+        
+        try 
+        {
+            String decryptedValue = encryptionService.decrypt(encryptedCredential);
+            
+            // Capture decryption activity for security audits
+            logger.info("Credential decrypted for platform: {}, credentialKey: {}, keyId: {}", 
+                       credential.getPlatform().getName(), 
+                       credential.getCredentialKey(), 
+                       credential.getKeyId());
+            
+            return decryptedValue;
+        } 
+        catch (Exception e) 
+        {
+            logger.error("Failed to decrypt credential {}: {}", credentialId, e.getMessage(), e);
+            throw new RuntimeException("Credential decryption failed", e);
+        }
+    }
+    
+    @Override
+    public boolean validateCredentialEncryption(UUID credentialId) 
+    {
+        try 
+        {
+            PlatformCredential credential = credentialRepository.findById(credentialId)
+                .orElseThrow(() -> new PlatformCredentialNotFoundException(credentialId));
+            
+            if (!credential.isEncrypted()) 
+            {
+                logger.debug("Credential {} is not encrypted", credentialId);
+                return false;
+            }
+            
+            EncryptedCredential encryptedCredential = credential.toEncryptedCredential();
+            // Delegate validation to encryption service so it can catch drift in key material
+            return encryptedCredential != null && encryptionService.validateEncryption(encryptedCredential);
+        } 
+        catch (Exception e) 
+        {
+            logger.debug("Encryption validation failed for credential {}: {}", credentialId, e.getMessage());
+            return false;
+        }
+    }
+    
+    @Override
+    @Transactional
+    public PlatformCredentialResponse reEncryptCredential(UUID credentialId) 
+    {
+        PlatformCredential credential = credentialRepository.findById(credentialId)
+            .orElseThrow(() -> new PlatformCredentialNotFoundException(credentialId));
+        
+        if (!credential.isEncrypted()) 
+        {
+            throw new IllegalArgumentException("Credential is not encrypted: " + credentialId);
+        }
+        
+        EncryptedCredential oldEncrypted = credential.toEncryptedCredential();
+        if (oldEncrypted == null) 
+        {
+            throw new IllegalStateException("Invalid encryption metadata for credential: " + credentialId);
+        }
+        
+        try 
+        {
+            // Run decryption + encryption cycle so data matches the latest policy
+            EncryptedCredential newEncrypted = encryptionService.reEncrypt(oldEncrypted);
+            
+            // Persist metadata returned by the encryption service to keep entity consistent
+            credential.updateFromEncryptedCredential(newEncrypted);
+            
+            PlatformCredential savedCredential = credentialRepository.save(credential);
+            
+            logger.info("Credential re-encrypted: {} from version {} to {}", 
+                       credentialId, oldEncrypted.encryptionVersion(), newEncrypted.encryptionVersion());
+            
+            return PlatformCredentialResponse.from(savedCredential);
+        } 
+        catch (Exception e) 
+        {
+            logger.error("Failed to re-encrypt credential {}: {}", credentialId, e.getMessage(), e);
+            throw new RuntimeException("Credential re-encryption failed", e);
+        }
+    }
+    
+    @Override
+    public List<PlatformCredentialResponse> findCredentialsNeedingReEncryption() 
+    {
+        // Surface rotation backlog to API clients instead of relying on ad-hoc SQL
+        List<PlatformCredential> allCredentials = credentialRepository.findAll();
+        
+        return allCredentials.stream()
+            .filter(PlatformCredential::isEncrypted)
+            .filter(credential -> {
+                EncryptedCredential encrypted = credential.toEncryptedCredential();
+                return encrypted != null && encryptionService.needsReEncryption(encrypted);
+            })
             .map(PlatformCredentialResponse::from)
             .collect(Collectors.toList());
     }

@@ -43,4 +43,18 @@ public interface PlatformCredentialService
     
     // find active credentials by platform name
     List<PlatformCredentialResponse> findByPlatformNameAndIsActive(String platformName, Boolean isActive);
+    
+    // * Secure Credential Operations
+    
+    // decrypt on demand so operators can retrieve secrets while keeping an audit trail
+    String getDecryptedCredentialValue(UUID credentialId);
+    
+    // verify encryption metadata is intact before expensive background work
+    boolean validateCredentialEncryption(UUID credentialId);
+    
+    // upgrade stored ciphertext to the latest algorithm/key material
+    PlatformCredentialResponse reEncryptCredential(UUID credentialId);
+    
+    // surface credentials whose metadata indicates they require rotation
+    List<PlatformCredentialResponse> findCredentialsNeedingReEncryption();
 }
