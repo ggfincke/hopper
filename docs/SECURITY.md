@@ -1,9 +1,26 @@
 # Security & Secrets
 
 ## Authentication & Authorization
-- JWT-based authentication with Spring Security implemented
-- Role-based access control for API endpoints
-- Refresh token mechanism for session management
+
+### JWT Authentication Implementation
+- **Token Types**: Access tokens (15 min) and refresh tokens (7 days, 30 days with remember-me)
+- **Token Storage**: Bearer tokens for access, secure HTTP-only cookies for refresh
+- **Security Integration**: Spring Security filters with custom authentication providers
+- **Token Validation**: Real-time user account status validation (enabled, locked)
+- **Endpoints**: Login, logout, refresh, validate, and user profile management
+
+### Role-Based Access Control (RBAC)
+- **System Roles**: ADMIN, USER, API_CLIENT with hierarchical permissions
+- **Method Security**: `@PreAuthorize` annotations for fine-grained endpoint control
+- **Role Assignment**: Dynamic role management through user administration
+- **Access Patterns**: Role-specific endpoint access and data visibility
+
+### Account Management
+- **User Registration**: Username, email, and password with validation
+- **Account Security**: BCrypt password encoding with salt
+- **Failed Login Tracking**: Automatic account locking after failed attempts
+- **Account Status**: Enable/disable and lock/unlock functionality
+- **Password Management**: Secure password change with current password validation
 
 ## Credential Encryption at Rest
 

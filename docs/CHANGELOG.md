@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 2025-09-18
+
+### Added
+- **Authentication & Authorization System**: Complete JWT-based security implementation
+  - JWT token generation, validation, and refresh mechanism with Spring Security integration
+  - Role-based access control (RBAC) with three system roles: ADMIN, USER, API_CLIENT
+  - Account management with locking, failed login tracking, and password change functionality
+  - Secure HTTP-only cookies for refresh tokens with configurable expiration
+  - Authentication filters and user details service for comprehensive security
+  - Method-level security with @PreAuthorize annotations
+  - CORS configuration for cross-origin request support
+  - Security endpoints: login, logout, refresh, validate, and user profile
+
+- **Credential Encryption**: Complete security implementation for platform credentials
+  - Domain primitives: EncryptedCredential, encryption exceptions, service interfaces
+  - AES-GCM-256 encryption service with key derivation and integrity validation
+  - JPA entity listener for transparent encryption/decryption lifecycle
+  - Database schema migration with encryption metadata columns
+  - Comprehensive test coverage for encryption workflows
+  - Configuration properties for encryption parameters and key management
+  - Service methods for credential decryption, validation, and re-encryption
+
 ## 2025-09-16
 
 ### Changed

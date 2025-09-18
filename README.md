@@ -10,13 +10,12 @@ Hopper is designed to centralize inventory management across multiple ecommerce 
 
 ## Planned Features
 
-- **Cross-platform inventory sync** - Maintain accurate stock levels across all marketplaces
-- **Centralized listing management** - Create and update listings from one interface
-- **Price optimization** - Dynamic pricing based on market conditions and competition
-- **Order fulfillment tracking** - Monitor orders from purchase to delivery
-- **Analytics and reporting** - Sales performance, profit margins, and market insights
-- **Automated repricing** - Keep listings competitive with market changes
-- **Low stock alerts** - Never oversell with intelligent inventory warnings
+- **Platform client implementations** - Direct API integration with eBay, Amazon, etc.
+- **Cross-platform inventory sync** - Real-time stock level synchronization
+- **Price optimization** - Dynamic pricing based on market conditions
+- **Analytics and reporting** - Sales performance and profit margin insights
+- **Automated repricing** - Competitive pricing algorithms
+- **Batch processing** - Background synchronization jobs
 
 ## Supported Platforms (Planned)
 
@@ -28,11 +27,13 @@ Hopper is designed to centralize inventory management across multiple ecommerce 
 
 ## Tech Stack
 
-- **Backend**: Spring Boot 3.5.5 + Kotlin 1.9.25
-- **Database**: PostgreSQL with Flyway migrations
-- **Security**: Spring Security
-- **Batch Processing**: Spring Batch for data synchronization
-- **Monitoring**: Spring Boot Actuator
+- **Backend**: Spring Boot 3.5.5 + Java (21/24)
+- **Database**: PostgreSQL (production) / H2 (development) with Flyway migrations
+- **Security**: Spring Security with JWT authentication
+- **Encryption**: AES-GCM-256 with PBKDF2 key derivation
+- **Build Tool**: Gradle with wrapper
+- **Monitoring**: Spring Boot Actuator with health checks
+- **Validation**: Bean validation with Hibernate Validator
 
 ## Getting Started
 
@@ -52,8 +53,21 @@ cd hopper
 # Build the project
 ./gradlew build
 
-# Run the application
+# Run the application (development mode with H2)
 ./gradlew bootRun
+```
+
+### Environment Configuration
+
+**Development**: Uses H2 database with default settings
+
+**Production**: Requires these environment variables:
+```bash
+export DATABASE_URL=jdbc:postgresql://localhost:5432/hopper
+export DATABASE_USERNAME=hopper_user
+export DATABASE_PASSWORD=your_db_password
+export JWT_SECRET=your_jwt_secret_key_minimum_256_bits
+export CREDENTIAL_MASTER_KEY=your_32_plus_character_encryption_key
 ```
 
 ## Development
@@ -67,7 +81,16 @@ cd hopper
 
 ## Configuration
 
-Database configuration and other settings can be found in `src/main/resources/application.properties`.
+The application uses profile-based configuration:
+- `application.properties` - Base configuration
+- `application-dev.properties` - Development (H2 database)
+- `application-prod.properties` - Production (PostgreSQL)
+
+**Key configuration areas:**
+- Database connections and JPA settings
+- JWT token expiration and security settings
+- Credential encryption parameters
+- CORS and security policies
 
 ## Project Status
 
