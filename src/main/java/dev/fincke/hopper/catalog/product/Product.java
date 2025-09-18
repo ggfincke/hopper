@@ -55,7 +55,7 @@ public class Product
 
     public Product(String sku, String name, BigDecimal price)
     {
-        this.sku = Objects.requireNonNull(sku, "sku").trim();
+        this.sku = sku == null ? null : sku.trim();
         this.name = Objects.requireNonNull(name, "name").trim();
         this.price = Objects.requireNonNull(price, "price").setScale(2, RoundingMode.HALF_UP);
         this.quantity = 0;
@@ -92,7 +92,7 @@ public class Product
     }   
     public void setSku(String sku)
     {
-        this.sku = sku;
+        this.sku = sku == null ? null : sku.trim();
     }
 
     // description

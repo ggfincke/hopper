@@ -17,11 +17,14 @@ public record OrderAddressUpdateRequest(
     
     // Postal/zip code (optional, US ZIP code format validation if provided)
     @Pattern(regexp = "^\\d{5}(-\\d{4})?$", message = "Postal code must be a valid US ZIP code (XXXXX or XXXXX-XXXX)")
-    String postalCode
-    
+    String postalCode,
+
+    // Country (optional)
+    String country
+
 )
 {
-    
+
     // Compact constructor normalizes data while preserving nulls for no-update
     public OrderAddressUpdateRequest
     {
@@ -31,11 +34,12 @@ public record OrderAddressUpdateRequest(
         state = state != null ? state.trim() : null;
         // Normalize postal code format (preserve null for no update)
         postalCode = postalCode != null ? postalCode.trim().replaceAll("\\s+", "") : null;
+        country = country != null ? country.trim() : null;
     }
     
     // Check if at least one field is provided for update
     public boolean hasUpdates()
     {
-        return street != null || city != null || state != null || postalCode != null;
+        return street != null || city != null || state != null || postalCode != null || country != null;
     }
 }

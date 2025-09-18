@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 2025-09-16
+
+### Changed
+- **Data Model Improvements**: Enhanced null safety and validation across entities
+  - Product: Made SKU nullable with trimming, Buyer: unique email constraint
+  - OrderAddress: Added country field, removed redundant index
+  - PlatformCredential: Changed to primitive boolean with convenience methods
+- **Schema Updates**: Added NOT NULL constraints and foreign key relationships
+
+### Fixed
+- Removed duplicate index on order_addresses.order_id
+
+## 2025-09-10
+
+### Added
+- **User Management System**: Complete authentication and authorization implementation with User and Role entities, BCrypt password encoding, account locking, and comprehensive service layer
+- **Database Schema for RBAC**: User authentication tables (users, roles, user_roles) with proper indexes, constraints, and predefined system roles (ADMIN, USER, API_CLIENT)
+- **User REST API**: CRUD endpoints for user operations including password change, role assignment, account enable/disable, and search functionality
+- **JWT Dependencies**: Added JJWT library dependencies for token-based authentication including API, implementation, and Jackson binding modules
+- **JWT Configuration Properties**: Added JWT configuration settings across all application profiles including token expiration, issuer, audience, and security settings
+- **JWT Authentication Implementation**: Complete JWT authentication system with Spring Security integration including token generation, validation, authentication filters, and user details service
+
+## 2025-09-09 
+
 ### Added
 - **Complete Service Layer Architecture**: Three-layer architecture (Controller → Service → Repository) for all domain entities (Product, Listing, Buyer, OrderAddress, Order, OrderItem, Platform, PlatformCredential, PlatformFee)
 - **Service Layer Business Logic**: Interface-based design with CRUD operations, validation, and domain-specific operations (stock management, status transitions, geographic queries, credential key management, fee calculations and aggregations)

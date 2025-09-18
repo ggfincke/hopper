@@ -14,7 +14,6 @@ import java.util.UUID;
     name = "order_addresses",
     uniqueConstraints = {@UniqueConstraint(name = "uq_order_addresses_order", columnNames = {"order_id"})},
     indexes = {
-        @Index(name = "idx_order_addresses_order", columnList = "order_id"),
         @Index(name = "idx_order_addresses_city", columnList = "city")
     }
 )
@@ -53,6 +52,11 @@ public class OrderAddress
     @Column(name = "postal_code", nullable = false)
     private String postalCode = "";
 
+    // country associated with the address (ISO code preferred)
+    @NotBlank
+    @Column(name = "country", nullable = false)
+    private String country = "";
+
     // * Constructors
     
     // Default constructor required by JPA
@@ -64,7 +68,8 @@ public class OrderAddress
                        String street,
                        String city,
                        String state,
-                       String postalCode)
+                       String postalCode,
+                       String country)
     {
         // Validate required order relationship
         this.order = Objects.requireNonNull(order, "order");
@@ -73,6 +78,7 @@ public class OrderAddress
         this.city = Objects.requireNonNull(city, "city").trim();
         this.state = Objects.requireNonNull(state, "state").trim();
         this.postalCode = Objects.requireNonNull(postalCode, "postalCode").trim();
+        this.country = Objects.requireNonNull(country, "country").trim();
     }
 
     // * Getters and Setters
@@ -149,6 +155,18 @@ public class OrderAddress
         this.postalCode = postalCode == null ? null : postalCode.trim();
     }
 
+    // country
+    public String getCountry()
+    {
+        return country;
+    }
+
+    // country (trims whitespace on set)
+    public void setCountry(String country)
+    {
+        this.country = country == null ? null : country.trim();
+    }
+
     // * Overrides
     @Override
     public boolean equals(Object o)
@@ -175,6 +193,7 @@ public class OrderAddress
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", postalCode='" + postalCode + '\'' +
+                ", country='" + country + '\'' +
                 '}';
     }
 }

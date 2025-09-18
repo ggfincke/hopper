@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -54,7 +55,7 @@ public class PlatformFee
     {
         this.order = Objects.requireNonNull(order, "order");
         this.feeType = Objects.requireNonNull(feeType, "feeType").trim();
-        this.amount = Objects.requireNonNull(amount, "amount");
+        this.amount = Objects.requireNonNull(amount, "amount").setScale(2, RoundingMode.HALF_UP);
     }
 
     // * Getters and Setters
@@ -96,7 +97,7 @@ public class PlatformFee
 
     public void setAmount(BigDecimal amount) 
     {
-        this.amount = amount;
+        this.amount = Objects.requireNonNull(amount, "amount").setScale(2, RoundingMode.HALF_UP);
     }
 
     // * Overrides

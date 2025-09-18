@@ -24,8 +24,11 @@ public record OrderAddressResponse(
     String state,
     
     // Postal/zip code (US format)
-    String postalCode
-    
+    String postalCode,
+
+    // Country (ISO code preferred)
+    String country
+
 )
 {
     
@@ -44,7 +47,8 @@ public record OrderAddressResponse(
             orderAddress.getStreet(),
             orderAddress.getCity(),
             orderAddress.getState(),
-            orderAddress.getPostalCode()
+            orderAddress.getPostalCode(),
+            orderAddress.getCountry()
         );
     }
 }

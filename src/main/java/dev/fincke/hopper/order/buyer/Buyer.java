@@ -12,6 +12,9 @@ import java.util.UUID;
 @Entity
 @Table(
     name = "buyers",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_buyers_email", columnNames = {"email"})
+    },
     indexes = {
         @Index(name = "idx_buyers_email", columnList = "email")
     }

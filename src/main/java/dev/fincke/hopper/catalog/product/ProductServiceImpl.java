@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -42,17 +43,18 @@ public class ProductServiceImpl implements ProductService
     public ProductResponse createProduct(ProductCreateRequest request) 
     {
         // validate SKU uniqueness if provided
-        if (request.sku() != null && !request.sku().trim().isEmpty()) 
+        String normalizedSku = normalizeSku(request.sku());
+        if (normalizedSku != null)
         {
-            if (existsBySku(request.sku().trim())) 
+            if (existsBySku(normalizedSku))
             {
-                throw new DuplicateSkuException(request.sku().trim());
+                throw new DuplicateSkuException(normalizedSku);
             }
         }
         
         // create and populate entity
         Product product = new Product(
-            request.sku(),
+            normalizedSku,
             request.name(),
             request.price()
         );
@@ -85,13 +87,17 @@ public class ProductServiceImpl implements ProductService
         }
         
         // update SKU if provided and different
-        if (request.sku() != null && !request.sku().equals(product.getSku())) 
+        if (request.sku() != null)
         {
-            if (existsBySku(request.sku())) 
+            String updatedSku = normalizeSku(request.sku());
+            if (!Objects.equals(updatedSku, product.getSku()))
             {
-                throw new DuplicateSkuException(request.sku());
+                if (existsBySku(updatedSku))
+                {
+                    throw new DuplicateSkuException(updatedSku);
+                }
+                product.setSku(updatedSku);
             }
-            product.setSku(request.sku());
         }
         
         // update name if provided
@@ -187,15 +193,33 @@ public class ProductServiceImpl implements ProductService
     @Override
     public ProductResponse findBySku(String sku) 
     {
-        Product product = productRepository.findBySku(sku.trim())
-            .orElseThrow(() -> new ProductNotFoundException(sku));
+        String normalizedSku = normalizeSku(sku);
+        if (normalizedSku == null)
+        {
+            throw new IllegalArgumentException("SKU cannot be null or blank");
+        }
+
+        Product product = productRepository.findBySku(normalizedSku)
+            .orElseThrow(() -> new ProductNotFoundException(normalizedSku));
         return ProductResponse.from(product);
     }
     
     // checks if a product exists by SKU (private helper for internal validation)
     private boolean existsBySku(String sku) 
     {
-        return productRepository.existsBySku(sku.trim());
+        String normalizedSku = normalizeSku(sku);
+        return normalizedSku != null && productRepository.existsBySku(normalizedSku);
+    }
+
+    // normalizes SKU values (null or blank -> null, trims otherwise)
+    private String normalizeSku(String sku)
+    {
+        if (sku == null)
+        {
+            return null;
+        }
+        String normalized = sku.trim();
+        return normalized.isEmpty() ? null : normalized;
     }
     
     @Override
