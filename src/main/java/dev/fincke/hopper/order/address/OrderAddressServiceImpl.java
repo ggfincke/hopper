@@ -5,6 +5,7 @@ import dev.fincke.hopper.order.address.dto.OrderAddressResponse;
 import dev.fincke.hopper.order.address.dto.OrderAddressUpdateRequest;
 import dev.fincke.hopper.order.address.exception.DuplicateOrderAddressException;
 import dev.fincke.hopper.order.address.exception.OrderAddressNotFoundException;
+import dev.fincke.hopper.order.address.exception.OrderAddressDeletionNotAllowedException;
 import dev.fincke.hopper.order.order.Order;
 import dev.fincke.hopper.order.order.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -155,8 +156,16 @@ public class OrderAddressServiceImpl implements OrderAddressService
         {
             throw new OrderAddressNotFoundException(id);
         }
-        
-        // TODO: check for dependencies (active shipments) before deletion
+
+        OrderAddress orderAddress = orderAddressRepository.findById(id)
+            .orElseThrow(() -> new OrderAddressNotFoundException(id));
+
+        String status = orderAddress.getOrder().getStatus();
+        if (!isFinalOrderStatus(status))
+        {
+            throw new OrderAddressDeletionNotAllowedException(id, "associated order is still active");
+        }
+
         orderAddressRepository.deleteById(id);
     }
     
@@ -268,4 +277,15 @@ public class OrderAddressServiceImpl implements OrderAddressService
         String cleanPostalCode = postalCode.trim();
         return US_POSTAL_CODE_PATTERN.matcher(cleanPostalCode).matches();
     }
+
+    private boolean isFinalOrderStatus(String status)
+    {
+        if (status == null)
+        {
+            return false;
+        }
+        String normalizedStatus = status.trim().toLowerCase();
+        return normalizedStatus.equals("delivered") || normalizedStatus.equals("cancelled") || normalizedStatus.equals("refunded");
+    }
+
 }

@@ -5,6 +5,10 @@ import dev.fincke.hopper.platform.platform.dto.PlatformResponse;
 import dev.fincke.hopper.platform.platform.dto.PlatformUpdateRequest;
 import dev.fincke.hopper.platform.platform.exception.DuplicatePlatformNameException;
 import dev.fincke.hopper.platform.platform.exception.PlatformNotFoundException;
+import dev.fincke.hopper.platform.platform.exception.PlatformDeletionNotAllowedException;
+import dev.fincke.hopper.catalog.listing.ListingRepository;
+import dev.fincke.hopper.platform.credential.PlatformCredentialRepository;
+import dev.fincke.hopper.order.order.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +25,21 @@ public class PlatformServiceImpl implements PlatformService
     
     // Spring will inject repository dependency
     private final PlatformRepository platformRepository;
+    private final ListingRepository listingRepository;
+    private final PlatformCredentialRepository credentialRepository;
+    private final OrderRepository orderRepository;
     
     // * Constructor
     
-    public PlatformServiceImpl(PlatformRepository platformRepository) 
+    public PlatformServiceImpl(PlatformRepository platformRepository,
+                                 ListingRepository listingRepository,
+                                 PlatformCredentialRepository credentialRepository,
+                                 OrderRepository orderRepository) 
     {
         this.platformRepository = platformRepository;
+        this.listingRepository = listingRepository;
+        this.credentialRepository = credentialRepository;
+        this.orderRepository = orderRepository;
     }
     
     // * Core CRUD Operations
@@ -107,8 +120,22 @@ public class PlatformServiceImpl implements PlatformService
         {
             throw new PlatformNotFoundException(id);
         }
-        
-        // TODO: validate no active listings or credentials before deletion
+
+        if (listingRepository.existsByPlatformId(id))
+        {
+            throw new PlatformDeletionNotAllowedException(id, "listings still reference this platform");
+        }
+
+        if (credentialRepository.existsByPlatformId(id))
+        {
+            throw new PlatformDeletionNotAllowedException(id, "credentials are still stored for this platform");
+        }
+
+        if (orderRepository.existsByPlatformId(id))
+        {
+            throw new PlatformDeletionNotAllowedException(id, "orders still reference this platform");
+        }
+
         platformRepository.deleteById(id);
     }
     

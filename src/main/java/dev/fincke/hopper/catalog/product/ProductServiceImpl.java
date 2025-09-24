@@ -6,6 +6,11 @@ import dev.fincke.hopper.catalog.product.dto.ProductUpdateRequest;
 import dev.fincke.hopper.catalog.product.exception.DuplicateSkuException;
 import dev.fincke.hopper.catalog.product.exception.InsufficientStockException;
 import dev.fincke.hopper.catalog.product.exception.ProductNotFoundException;
+import dev.fincke.hopper.catalog.product.exception.ProductDeletionNotAllowedException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import dev.fincke.hopper.catalog.listing.ListingRepository;
+import dev.fincke.hopper.order.item.OrderItemRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,26 +19,27 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Service implementation for product business operations.
- * 
- * Handles all product-related business logic including validation, 
- * inventory management, and data transformation between entities and DTOs.
- */
+// Service implementation for product business operations
 @Service
 @Transactional(readOnly = true) // default to read-only transactions
 public class ProductServiceImpl implements ProductService 
 {
     // * Dependencies
     
-    // repository for product data access
+    // Spring will inject repository dependencies
     private final ProductRepository productRepository;
+    private final ListingRepository listingRepository;
+    private final OrderItemRepository orderItemRepository;
     
     // * Constructor
     
-    public ProductServiceImpl(ProductRepository productRepository) 
+    public ProductServiceImpl(ProductRepository productRepository,
+                              ListingRepository listingRepository,
+                              OrderItemRepository orderItemRepository) 
     {
         this.productRepository = productRepository;
+        this.listingRepository = listingRepository;
+        this.orderItemRepository = orderItemRepository;
     }
     
     // * Core CRUD Operations
@@ -143,6 +149,14 @@ public class ProductServiceImpl implements ProductService
             .map(ProductResponse::from)
             .collect(Collectors.toList());
     }
+
+    @Override
+    public Page<ProductResponse> findAll(Pageable pageable)
+    {
+        Pageable resolved = pageable == null ? Pageable.unpaged() : pageable;
+        return productRepository.findAll(resolved)
+            .map(ProductResponse::from);
+    }
     
     @Override
     @Transactional
@@ -152,8 +166,17 @@ public class ProductServiceImpl implements ProductService
         {
             throw new ProductNotFoundException(id);
         }
-        
-        // TODO: check for dependencies (listings, order items) before deletion
+
+        if (listingRepository.existsByProductId(id))
+        {
+            throw new ProductDeletionNotAllowedException(id, "active listings exist");
+        }
+
+        if (orderItemRepository.existsByListingProductId(id))
+        {
+            throw new ProductDeletionNotAllowedException(id, "order items reference this product");
+        }
+
         productRepository.deleteById(id);
     }
     
@@ -188,6 +211,14 @@ public class ProductServiceImpl implements ProductService
         return productRepository.findByQuantityLessThanEqual(threshold).stream()
             .map(ProductResponse::from)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ProductResponse> findLowStockProducts(int threshold, Pageable pageable)
+    {
+        Pageable resolved = pageable == null ? Pageable.unpaged() : pageable;
+        return productRepository.findByQuantityLessThanEqual(threshold, resolved)
+            .map(ProductResponse::from);
     }
     
     @Override
@@ -228,5 +259,13 @@ public class ProductServiceImpl implements ProductService
         return productRepository.findByNameContainingIgnoreCase(name.trim()).stream()
             .map(ProductResponse::from)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ProductResponse> findByNameContaining(String name, Pageable pageable)
+    {
+        Pageable resolved = pageable == null ? Pageable.unpaged() : pageable;
+        return productRepository.findByNameContainingIgnoreCase(name.trim(), resolved)
+            .map(ProductResponse::from);
     }
 }

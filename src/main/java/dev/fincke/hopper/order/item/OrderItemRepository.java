@@ -19,4 +19,10 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, UUID>
 
     // find items by order ID
     List<OrderItem> findByOrderId(UUID orderId);
+
+    // check if any order items reference the given listing ID
+    boolean existsByListingId(UUID listingId);
+
+    // check if any order items reference the given product ID through listing
+    boolean existsByListingProductId(UUID productId);
 }

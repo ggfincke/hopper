@@ -5,6 +5,8 @@ import dev.fincke.hopper.order.buyer.dto.BuyerResponse;
 import dev.fincke.hopper.order.buyer.dto.BuyerUpdateRequest;
 import dev.fincke.hopper.order.buyer.exception.BuyerNotFoundException;
 import dev.fincke.hopper.order.buyer.exception.DuplicateEmailException;
+import dev.fincke.hopper.order.buyer.exception.BuyerDeletionNotAllowedException;
+import dev.fincke.hopper.order.order.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ public class BuyerServiceImpl implements BuyerService
     
     // Repository for buyer data access
     private final BuyerRepository buyerRepository;
+    private final OrderRepository orderRepository;
     
     // Email pattern for additional validation beyond @Email annotation (business rule)
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
@@ -33,9 +36,10 @@ public class BuyerServiceImpl implements BuyerService
     // * Constructor
     
     // Constructor injection for repository dependency
-    public BuyerServiceImpl(BuyerRepository buyerRepository)
+    public BuyerServiceImpl(BuyerRepository buyerRepository, OrderRepository orderRepository)
     {
         this.buyerRepository = buyerRepository;
+        this.orderRepository = orderRepository;
     }
     
     // * Core CRUD Operations
@@ -120,8 +124,12 @@ public class BuyerServiceImpl implements BuyerService
         {
             throw new BuyerNotFoundException(id);
         }
-        
-        // TODO: check for dependencies (active orders) before deletion
+
+        if (orderRepository.existsByBuyerId(id))
+        {
+            throw new BuyerDeletionNotAllowedException(id);
+        }
+
         buyerRepository.deleteById(id);
     }
     
