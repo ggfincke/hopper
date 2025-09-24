@@ -1,5 +1,7 @@
 package dev.fincke.hopper.catalog.product;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -21,7 +23,13 @@ public interface ProductRepository extends JpaRepository<Product, UUID>
     
     // find products with stock at or below threshold
     List<Product> findByQuantityLessThanEqual(int quantity);
+
+    // find products with stock at or below threshold with pagination support
+    Page<Product> findByQuantityLessThanEqual(int quantity, Pageable pageable);
     
     // find products by partial name match (case-insensitive)
     List<Product> findByNameContainingIgnoreCase(String name);
+
+    // find products by partial name match with pagination support
+    Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }

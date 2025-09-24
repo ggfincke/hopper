@@ -7,6 +7,9 @@ import dev.fincke.hopper.catalog.listing.dto.ListingUpdateRequest;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 // Service interface for listing business operations (separates business rules from data access)
 public interface ListingService 
 {
@@ -23,6 +26,9 @@ public interface ListingService
     
     // get all listings
     List<ListingResponse> findAll();
+
+    // get listings with pagination support
+    Page<ListingResponse> findAll(Pageable pageable);
     
     // delete listing
     void deleteListing(UUID id);
@@ -42,12 +48,21 @@ public interface ListingService
     
     // find listings by product ID
     List<ListingResponse> findByProductId(UUID productId);
+
+    // find listings by product ID with pagination support
+    Page<ListingResponse> findByProductId(UUID productId, Pageable pageable);
     
     // find listings by platform ID
     List<ListingResponse> findByPlatformId(UUID platformId);
+
+    // find listings by platform ID with pagination support
+    Page<ListingResponse> findByPlatformId(UUID platformId, Pageable pageable);
     
     // find listings by status
     List<ListingResponse> findByStatus(String status);
+
+    // find listings by status with pagination support
+    Page<ListingResponse> findByStatus(String status, Pageable pageable);
     
     // find listing by platform and external listing ID
     ListingResponse findByPlatformAndExternalListingId(UUID platformId, String externalListingId);

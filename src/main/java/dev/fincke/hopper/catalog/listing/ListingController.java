@@ -4,12 +4,14 @@ import dev.fincke.hopper.catalog.listing.dto.ListingCreateRequest;
 import dev.fincke.hopper.catalog.listing.dto.ListingResponse;
 import dev.fincke.hopper.catalog.listing.dto.ListingUpdateRequest;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 // REST controller handling listing API endpoints
@@ -55,9 +57,9 @@ public class ListingController
     
     // GET /api/listings - get all listings
     @GetMapping
-    public List<ListingResponse> getAllListings()
+    public Page<ListingResponse> getAllListings(@PageableDefault(size = 20) Pageable pageable)
     {
-        return listingService.findAll();
+        return listingService.findAll(pageable);
     }
     
     // DELETE /api/listings/{id} - delete listing
@@ -95,23 +97,26 @@ public class ListingController
     
     // GET /api/listings?productId={id} - find listings by product
     @GetMapping(params = "productId")
-    public List<ListingResponse> getByProductId(@RequestParam UUID productId)
+    public Page<ListingResponse> getByProductId(@RequestParam UUID productId,
+                                             @PageableDefault(size = 20) Pageable pageable)
     {
-        return listingService.findByProductId(productId);
+        return listingService.findByProductId(productId, pageable);
     }
     
     // GET /api/listings?platformId={id} - find listings by platform
     @GetMapping(params = "platformId")
-    public List<ListingResponse> getByPlatformId(@RequestParam UUID platformId)
+    public Page<ListingResponse> getByPlatformId(@RequestParam UUID platformId,
+                                          @PageableDefault(size = 20) Pageable pageable)
     {
-        return listingService.findByPlatformId(platformId);
+        return listingService.findByPlatformId(platformId, pageable);
     }
     
     // GET /api/listings?status={status} - find listings by status
     @GetMapping(params = "status")
-    public List<ListingResponse> getByStatus(@RequestParam String status)
+    public Page<ListingResponse> getByStatus(@RequestParam String status,
+                                     @PageableDefault(size = 20) Pageable pageable)
     {
-        return listingService.findByStatus(status);
+        return listingService.findByStatus(status, pageable);
     }
     
     // GET /api/listings?platformId={id}&externalListingId={id} - find by platform and external ID
