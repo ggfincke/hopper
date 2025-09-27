@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 2025-09-27
+
+### Added
+- **Marketplace Client Abstractions**: Java interface, value objects, and DTO mappers for marketplace connectors
+  - Normalized domain-to-connector command/result records with comment-style aligned documentation
+  - Stub client providing deterministic demo behaviour and error simulations for INVALID_REQUEST, RATE_LIMIT, RETRYABLE_UPSTREAM
+  - Remote REST client scaffold using configurable `marketplace.client.*` properties for a future Go connector integration
+  - Configuration properties and Spring wiring to toggle between stub and remote implementations via `MarketplaceClientMode`
+  - Unit tests covering stub logic and configuration selection with ApplicationContextRunner harness
+
+### Documentation
+- Updated code comments across new marketplace files to comply with `docs/COMMENT-STYLE.md`
+
 ## 2025-09-26
 
 ### Added
