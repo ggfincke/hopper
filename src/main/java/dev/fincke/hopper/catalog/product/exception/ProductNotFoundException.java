@@ -2,16 +2,13 @@ package dev.fincke.hopper.catalog.product.exception;
 
 import java.util.UUID;
 
-/**
- * Exception thrown when a requested product cannot be found in the system.
- * 
- * Used for operations that require an existing product to be present.
- */
+// Signals that a requested product could not be found.
+// Allows callers to translate missing resources into appropriate API responses.
 public class ProductNotFoundException extends RuntimeException 
 {
     // * Attributes
     
-    // ID of the product that was not found
+    // Product ID that was requested but not found (null when looked up by SKU)
     private final UUID productId;
     
     // * Constructors
@@ -42,7 +39,7 @@ public class ProductNotFoundException extends RuntimeException
     
     // * Getters
     
-    // returns the ID of the product that was not found (may be null for SKU-based lookups)
+    // Product ID associated with the missing resource (may be null)
     public UUID getProductId() 
     {
         return productId;

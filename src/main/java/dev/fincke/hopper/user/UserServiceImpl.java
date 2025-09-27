@@ -197,12 +197,14 @@ public class UserServiceImpl implements UserService
     public void deleteUser(UUID id)
     {
         
-        if (!userRepository.existsById(id))
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException(id));
+
+        if (user.isEnabled())
         {
-            throw new UserNotFoundException(id);
+            throw new UserDeletionNotAllowedException(id, "disable the account before deletion");
         }
-        
-        // TODO: Check for dependencies (active sessions, orders) before deletion
+
         userRepository.deleteById(id);
     }
     

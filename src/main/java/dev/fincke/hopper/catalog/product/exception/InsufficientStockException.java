@@ -2,23 +2,19 @@ package dev.fincke.hopper.catalog.product.exception;
 
 import java.util.UUID;
 
-/**
- * Exception thrown when attempting to reduce product stock below zero
- * or reserve more stock than is available.
- * 
- * Prevents negative inventory which would indicate overselling.
- */
+// Thrown when a stock update would drop inventory below zero or exceed available reserves.
+// Safeguards against overselling by surfacing the shortage to callers.
 public class InsufficientStockException extends RuntimeException 
 {
     // * Attributes
     
-    // ID of the product with insufficient stock
+    // Product ID that lacks enough stock for the requested operation
     private final UUID productId;
     
-    // current available stock
+    // Current available stock level when the exception was raised
     private final int availableStock;
     
-    // requested stock amount
+    // Requested stock amount that could not be fulfilled
     private final int requestedStock;
     
     // * Constructors
@@ -51,19 +47,19 @@ public class InsufficientStockException extends RuntimeException
     
     // * Getters
     
-    // returns the ID of the product with insufficient stock
+    // Product ID tied to the stock shortage
     public UUID getProductId() 
     {
         return productId;
     }
     
-    // returns the current available stock amount
+    // Snapshot of the stock level available when the exception occurred
     public int getAvailableStock() 
     {
         return availableStock;
     }
     
-    // returns the requested stock amount that couldn't be fulfilled
+    // Amount of stock the caller attempted to reserve or remove
     public int getRequestedStock() 
     {
         return requestedStock;

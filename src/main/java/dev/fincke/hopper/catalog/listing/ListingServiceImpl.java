@@ -6,6 +6,10 @@ import dev.fincke.hopper.catalog.listing.dto.ListingUpdateRequest;
 import dev.fincke.hopper.catalog.listing.exception.DuplicateListingException;
 import dev.fincke.hopper.catalog.listing.exception.InvalidListingStatusException;
 import dev.fincke.hopper.catalog.listing.exception.ListingNotFoundException;
+import dev.fincke.hopper.catalog.listing.exception.ListingDeletionNotAllowedException;
+import dev.fincke.hopper.order.item.OrderItemRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import dev.fincke.hopper.catalog.product.Product;
 import dev.fincke.hopper.catalog.product.ProductRepository;
 import dev.fincke.hopper.platform.platform.Platform;
@@ -29,16 +33,19 @@ public class ListingServiceImpl implements ListingService
     private final ListingRepository listingRepository;
     private final ProductRepository productRepository;
     private final PlatformRepository platformRepository;
+    private final OrderItemRepository orderItemRepository;
     
     // * Constructor
     
     public ListingServiceImpl(ListingRepository listingRepository, 
                              ProductRepository productRepository,
-                             PlatformRepository platformRepository) 
+                             PlatformRepository platformRepository,
+                             OrderItemRepository orderItemRepository) 
     {
         this.listingRepository = listingRepository;
         this.productRepository = productRepository;
         this.platformRepository = platformRepository;
+        this.orderItemRepository = orderItemRepository;
     }
     
     // * Core CRUD Operations
@@ -137,6 +144,14 @@ public class ListingServiceImpl implements ListingService
             .map(ListingResponse::from)
             .collect(Collectors.toList());
     }
+
+    @Override
+    public Page<ListingResponse> findAll(Pageable pageable)
+    {
+        Pageable resolved = pageable == null ? Pageable.unpaged() : pageable;
+        return listingRepository.findAll(resolved)
+            .map(ListingResponse::from);
+    }
     
     @Override
     @Transactional
@@ -146,8 +161,12 @@ public class ListingServiceImpl implements ListingService
         {
             throw new ListingNotFoundException(id);
         }
-        
-        // TODO: validate no active orders before deletion
+
+        if (orderItemRepository.existsByListingId(id))
+        {
+            throw new ListingDeletionNotAllowedException(id, "order items reference this listing");
+        }
+
         listingRepository.deleteById(id);
     }
     
@@ -193,6 +212,14 @@ public class ListingServiceImpl implements ListingService
             .map(ListingResponse::from)
             .collect(Collectors.toList());
     }
+
+    @Override
+    public Page<ListingResponse> findByProductId(UUID productId, Pageable pageable)
+    {
+        Pageable resolved = pageable == null ? Pageable.unpaged() : pageable;
+        return listingRepository.findByProductId(productId, resolved)
+            .map(ListingResponse::from);
+    }
     
     @Override
     public List<ListingResponse> findByPlatformId(UUID platformId) 
@@ -201,6 +228,14 @@ public class ListingServiceImpl implements ListingService
             .map(ListingResponse::from)
             .collect(Collectors.toList());
     }
+
+    @Override
+    public Page<ListingResponse> findByPlatformId(UUID platformId, Pageable pageable)
+    {
+        Pageable resolved = pageable == null ? Pageable.unpaged() : pageable;
+        return listingRepository.findByPlatformId(platformId, resolved)
+            .map(ListingResponse::from);
+    }
     
     @Override
     public List<ListingResponse> findByStatus(String status) 
@@ -208,6 +243,14 @@ public class ListingServiceImpl implements ListingService
         return listingRepository.findByStatus(status.trim()).stream()
             .map(ListingResponse::from)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ListingResponse> findByStatus(String status, Pageable pageable) 
+    {
+        Pageable resolved = pageable == null ? Pageable.unpaged() : pageable;
+        return listingRepository.findByStatus(status.trim(), resolved)
+            .map(ListingResponse::from);
     }
     
     @Override

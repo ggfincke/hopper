@@ -4,26 +4,23 @@ import dev.fincke.hopper.catalog.product.dto.ProductCreateRequest;
 import dev.fincke.hopper.catalog.product.dto.ProductResponse;
 import dev.fincke.hopper.catalog.product.dto.ProductUpdateRequest;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
-/**
- * REST controller for product operations.
- * 
- * Provides CRUD endpoints for product management with proper validation
- * and error handling. Uses service layer for business logic.
- */
+// REST controller handling product API endpoints
 @RestController
 @RequestMapping("/api/products")
 public class ProductController
 {
     // * Dependencies
     
-    // service for product business logic
+    // Spring will inject service dependency
     private final ProductService productService;
 
     // * Constructor
@@ -44,9 +41,9 @@ public class ProductController
     
     // GET /api/products - list all products
     @GetMapping
-    public List<ProductResponse> listProducts()
+    public Page<ProductResponse> listProducts(@PageableDefault(size = 20) Pageable pageable)
     {
-        return productService.findAll();
+        return productService.findAll(pageable);
     }
     
     // GET /api/products/{id} - get product by ID
@@ -82,16 +79,18 @@ public class ProductController
     
     // GET /api/products/search - search products by name
     @GetMapping("/search")
-    public List<ProductResponse> searchProducts(@RequestParam String name)
+    public Page<ProductResponse> searchProducts(@RequestParam String name,
+                                                    @PageableDefault(size = 20) Pageable pageable)
     {
-        return productService.findByNameContaining(name);
+        return productService.findByNameContaining(name, pageable);
     }
     
     // GET /api/products/low-stock - find low stock products
     @GetMapping("/low-stock")
-    public List<ProductResponse> getLowStockProducts(@RequestParam(defaultValue = "10") int threshold)
+    public Page<ProductResponse> getLowStockProducts(@RequestParam(defaultValue = "10") int threshold,
+                                                   @PageableDefault(size = 20) Pageable pageable)
     {
-        return productService.findLowStockProducts(threshold);
+        return productService.findLowStockProducts(threshold, pageable);
     }
     
     // * Stock Management Endpoints

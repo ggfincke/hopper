@@ -1,16 +1,12 @@
 package dev.fincke.hopper.catalog.product.exception;
 
-/**
- * Exception thrown when attempting to create or update a product with a SKU 
- * that already exists in the system.
- * 
- * SKUs must be unique across all products to prevent inventory conflicts.
- */
+// Raised when a product create/update reuses an existing SKU.
+// Enforces SKU uniqueness so downstream systems see one product per identifier.
 public class DuplicateSkuException extends RuntimeException 
 {
     // * Attributes
     
-    // the duplicate SKU that caused the exception
+    // Conflicting SKU value supplied by the client
     private final String sku;
     
     // * Constructors
@@ -35,7 +31,7 @@ public class DuplicateSkuException extends RuntimeException
     
     // * Getters
     
-    // returns the duplicate SKU that caused this exception
+    // Conflicting SKU that triggered the uniqueness check
     public String getSku() 
     {
         return sku;

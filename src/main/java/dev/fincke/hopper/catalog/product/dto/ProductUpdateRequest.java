@@ -5,12 +5,8 @@ import jakarta.validation.constraints.Min;
 
 import java.math.BigDecimal;
 
-/**
- * Request DTO for updating an existing product.
- * 
- * All fields are optional - only provided fields will be updated.
- * Allows partial updates without requiring all product data.
- */
+// DTO for partial product updates.
+// Lets clients send only changed fields while validation still protects business rules.
 public record ProductUpdateRequest(
     // SKU (optional update, must be unique if provided)
     String sku,
@@ -40,7 +36,7 @@ public record ProductUpdateRequest(
     
     // * Utility Methods
     
-    // checks if any field has been provided for update
+    // checks if caller supplied at least one field to update
     public boolean hasUpdates() 
     {
         return sku != null || name != null || description != null || price != null || quantity != null;

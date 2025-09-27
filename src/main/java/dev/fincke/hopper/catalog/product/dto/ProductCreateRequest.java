@@ -7,12 +7,8 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-/**
- * Request DTO for creating a new product.
- * 
- * Contains all required and optional fields for product creation with
- * validation constraints to ensure data integrity before business logic.
- */
+// DTO for product creation requests.
+// Applies validation rules so invalid inventory never reaches the domain layer.
 public record ProductCreateRequest(
     // SKU (optional, must be unique if provided)
     String sku,
@@ -41,7 +37,7 @@ public record ProductCreateRequest(
         name = name != null ? name.trim() : name;
         description = description != null ? description.trim() : description;
         
-        // ensure quantity defaults to 0 if not provided
+        // ensure quantity defaults to 0 if caller omits or passes negative values
         quantity = Math.max(0, quantity);
     }
 }

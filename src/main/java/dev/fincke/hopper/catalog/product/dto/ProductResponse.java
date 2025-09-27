@@ -5,29 +5,25 @@ import dev.fincke.hopper.catalog.product.Product;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-/**
- * Response DTO for product data.
- * 
- * Immutable representation of product data for API responses.
- * Prevents accidental entity modification and provides clean API contract.
- */
+// Immutable product representation returned to API consumers.
+// Prevents leaking JPA entities and keeps response payloads consistent.
 public record ProductResponse(
-    // product ID
+    // product ID surfaced to clients
     UUID id,
     
-    // SKU of product (may be null)
+    // SKU exposed for integrations (may be null)
     String sku,
     
-    // name of product
+    // human-readable product name
     String name,
     
-    // description of product (may be null)
+    // optional product description
     String description,
     
-    // price of product
+    // sale price presented to clients
     BigDecimal price,
     
-    // current stock quantity
+    // up-to-date inventory level shown to callers
     int quantity
 ) {
     // * Static Factory Methods
