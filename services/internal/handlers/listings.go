@@ -3,25 +3,22 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
+const idempotencyHeader = "Idempotency-Key"
 
-// Media captures optional listing media entries
 type Media struct {
 	URL string `json:"url"`
 }
 
-// PricePayload represents the price structure expected from the Java client
 type PricePayload struct {
 	Amount   string `json:"amount"`
 	Currency string `json:"currency"`
 }
 
-// ListingRequest matches the shared contract for creating listings through the connector
 type ListingRequest struct {
 	Platform        string       `json:"platform"`
 	SellerAccountID string       `json:"sellerAccountId"`
@@ -33,41 +30,78 @@ type ListingRequest struct {
 	Media           []Media      `json:"media,omitempty"`
 }
 
-// ListingResponse is a stubbed representation of the connector response for listing creation
-type ListingResponse struct {
-	ListingID  string `json:"listingId"`
-	ExternalID string `json:"externalId,omitempty"`
-	Status     string `json:"status"`
+type ErrorDetail struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
 }
 
-// CreateListing returns a handler that accepts the full listing payload and responds with stubbed data
-func CreateListing() http.HandlerFunc {
+type ListingResponse struct {
+	ListingID  string        `json:"listingId"`
+	ExternalID string        `json:"externalId,omitempty"`
+	Status     string        `json:"status"`
+	Errors     []ErrorDetail `json:"errors,omitempty"`
+}
+
+func CreateListing(store ListingStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
+		key := strings.TrimSpace(r.Header.Get(idempotencyHeader))
+		if key == "" {
+			writeError(w, http.StatusBadRequest, "INVALID_REQUEST", "Idempotency-Key header is required")
+			return
+		}
+
 		var req ListingRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			respondListingError(w, http.StatusBadRequest, "invalid JSON payload")
+			writeError(w, http.StatusBadRequest, "INVALID_REQUEST", "invalid JSON payload")
 			return
 		}
 
 		if err := validateListingRequest(req); err != nil {
-			respondListingError(w, http.StatusBadRequest, err.Error())
+			writeError(w, http.StatusBadRequest, "INVALID_REQUEST", err.Error())
 			return
 		}
 
-		resp := ListingResponse{
-			ListingID: fmt.Sprintf("stub-%s-%s", strings.ToLower(req.Platform), strings.ToLower(req.SKU)),
-			Status:    "PENDING",
+		resp, deduped, err := store.CreateListing(key, req)
+		switch {
+		case err == nil:
+			status := http.StatusCreated
+			if deduped {
+				status = http.StatusOK
+			}
+			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set(idempotencyHeader, key)
+			w.WriteHeader(status)
+			_ = json.NewEncoder(w).Encode(resp)
+		case errors.Is(err, ErrIdempotencyConflict):
+			writeError(w, http.StatusConflict, "CONFLICT", "idempotency key already used for a different payload")
+		default:
+			writeError(w, http.StatusInternalServerError, "UNKNOWN", "failed to create listing")
+		}
+	}
+}
+
+func GetListing(store ListingStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := strings.TrimSpace(r.PathValue("id"))
+		if id == "" {
+			writeError(w, http.StatusBadRequest, "INVALID_REQUEST", "listing id is required")
+			return
+		}
+
+		resp, ok := store.GetListing(id)
+		if !ok {
+			writeError(w, http.StatusNotFound, "NOT_FOUND", "listing not found")
+			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 		_ = json.NewEncoder(w).Encode(resp)
 	}
 }
 
-// Validate the listing request payload
 func validateListingRequest(req ListingRequest) error {
 	if strings.TrimSpace(req.Platform) == "" {
 		return errors.New("platform is required")
@@ -89,14 +123,13 @@ func validateListingRequest(req ListingRequest) error {
 	}
 	for idx, media := range req.Media {
 		if strings.TrimSpace(media.URL) == "" {
-			return fmt.Errorf("media[%d].url is required", idx)
+			return errors.New("media[" + strconv.Itoa(idx) + "].url is required")
 		}
 	}
 	return nil
 }
 
 func validatePrice(pricePayload PricePayload, platform string) error {
-	// Validate that price fields are not empty
 	if strings.TrimSpace(pricePayload.Amount) == "" {
 		return errors.New("price.amount is required")
 	}
@@ -104,7 +137,6 @@ func validatePrice(pricePayload PricePayload, platform string) error {
 		return errors.New("price.currency is required")
 	}
 
-	// Parse the amount as a float64 for validation
 	amount, err := strconv.ParseFloat(pricePayload.Amount, 64)
 	if err != nil {
 		return errors.New("price.amount must be a valid decimal number")
@@ -114,7 +146,6 @@ func validatePrice(pricePayload PricePayload, platform string) error {
 		return errors.New("price.amount must be greater than zero")
 	}
 
-	// Validate currency (support common currencies)
 	validCurrencies := []string{"USD", "EUR", "GBP", "CAD", "AUD"}
 	currencyValid := false
 	for _, validCurrency := range validCurrencies {
@@ -124,20 +155,14 @@ func validatePrice(pricePayload PricePayload, platform string) error {
 		}
 	}
 	if !currencyValid {
-		return fmt.Errorf("price.currency '%s' is not supported. Supported currencies: %s", 
-			pricePayload.Currency, strings.Join(validCurrencies, ", "))
+		return errors.New("price.currency '" + pricePayload.Currency + "' is not supported. Supported currencies: " + strings.Join(validCurrencies, ", "))
 	}
 
-	// Platform-specific validations
-	if strings.EqualFold(platform, "ebay") && amount < 0.99 {
-		return errors.New("price.amount must be at least 0.99 for eBay listings")
+	if strings.EqualFold(platform, "ebay") {
+		if amount < 0.99 {
+			return errors.New("price.amount must be at least 0.99 for eBay listings")
+		}
 	}
 
 	return nil
-}
-
-func respondListingError(w http.ResponseWriter, status int, message string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(map[string]string{"error": message})
 }

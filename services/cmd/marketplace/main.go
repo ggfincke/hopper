@@ -20,9 +20,14 @@ func main() {
 		port = defaultPort
 	}
 
+	store := handlers.NewStubStore()
+
 	mux := http.NewServeMux()
 	mux.Handle("/v1/health", handlers.Health(serviceName, serviceVersion))
-	mux.Handle("POST /v1/listings", handlers.CreateListing())
+	mux.Handle("POST /v1/listings", handlers.CreateListing(store))
+	mux.Handle("GET /v1/listings/{id}", handlers.GetListing(store))
+	mux.Handle("POST /v1/orders", handlers.CreateOrder(store))
+	mux.Handle("GET /v1/orders/{id}", handlers.GetOrder(store))
 
 	addr := ":" + port
 	log.Printf("starting %s on %s", serviceName, addr)
