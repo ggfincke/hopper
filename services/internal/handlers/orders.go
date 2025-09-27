@@ -6,43 +6,9 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	apitypes "github.com/ggfincke/hopper/services/marketplace/internal/types"
 )
-
-type OrderRequest struct {
-	Platform        string       `json:"platform"`
-	SellerAccountID string       `json:"sellerAccountId"`
-	ListingID       string       `json:"listingId,omitempty"`
-	SKU             string       `json:"sku,omitempty"`
-	Buyer           BuyerPayload `json:"buyer"`
-	Items           []OrderItem  `json:"items"`
-	IdempotencyKey  string       `json:"idempotencyKey,omitempty"`
-}
-
-type BuyerPayload struct {
-	Name    string         `json:"name"`
-	Address AddressPayload `json:"address"`
-}
-
-type AddressPayload struct {
-	Line1   string `json:"line1"`
-	City    string `json:"city"`
-	Region  string `json:"region"`
-	Postal  string `json:"postal"`
-	Country string `json:"country"`
-}
-
-type OrderItem struct {
-	SKU      string       `json:"sku"`
-	Quantity int          `json:"quantity"`
-	Price    PricePayload `json:"price"`
-}
-
-type OrderResponse struct {
-	OrderID    string        `json:"orderId"`
-	ExternalID string        `json:"externalId,omitempty"`
-	Status     string        `json:"status"`
-	Errors     []ErrorDetail `json:"errors,omitempty"`
-}
 
 func CreateOrder(store OrderStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +20,7 @@ func CreateOrder(store OrderStore) http.HandlerFunc {
 			return
 		}
 
-		var req OrderRequest
+		var req apitypes.OrderRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			writeError(w, http.StatusBadRequest, "INVALID_REQUEST", "invalid JSON payload")
 			return
@@ -111,7 +77,7 @@ func GetOrder(store OrderStore) http.HandlerFunc {
 	}
 }
 
-func validateOrderRequest(req OrderRequest) error {
+func validateOrderRequest(req apitypes.OrderRequest) error {
 	if strings.TrimSpace(req.Platform) == "" {
 		return errors.New("platform is required")
 	}
@@ -144,7 +110,7 @@ func validateOrderRequest(req OrderRequest) error {
 	return nil
 }
 
-func validateAddress(addr AddressPayload) error {
+func validateAddress(addr apitypes.AddressPayload) error {
 	if strings.TrimSpace(addr.Line1) == "" {
 		return errors.New("buyer.address.line1 is required")
 	}

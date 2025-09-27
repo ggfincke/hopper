@@ -7,6 +7,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	apitypes "github.com/ggfincke/hopper/services/marketplace/internal/types"
 )
 
 var (
@@ -15,13 +17,13 @@ var (
 )
 
 type ListingStore interface {
-	CreateListing(key string, req ListingRequest) (ListingResponse, bool, error)
-	GetListing(id string) (ListingResponse, bool)
+	CreateListing(key string, req apitypes.ListingRequest) (apitypes.ListingResponse, bool, error)
+	GetListing(id string) (apitypes.ListingResponse, bool)
 }
 
 type OrderStore interface {
-	CreateOrder(key string, req OrderRequest) (OrderResponse, bool, error)
-	GetOrder(id string) (OrderResponse, bool)
+	CreateOrder(key string, req apitypes.OrderRequest) (apitypes.OrderResponse, bool, error)
+	GetOrder(id string) (apitypes.OrderResponse, bool)
 }
 
 type StubStore struct {
@@ -34,14 +36,14 @@ type StubStore struct {
 }
 
 type listingRecord struct {
-	Request   ListingRequest
-	Response  ListingResponse
+	Request   apitypes.ListingRequest
+	Response  apitypes.ListingResponse
 	CreatedAt time.Time
 }
 
 type orderRecord struct {
-	Request   OrderRequest
-	Response  OrderResponse
+	Request   apitypes.OrderRequest
+	Response  apitypes.OrderResponse
 	CreatedAt time.Time
 }
 
@@ -55,20 +57,20 @@ func NewStubStore() *StubStore {
 	}
 }
 
-func (s *StubStore) CreateListing(key string, req ListingRequest) (ListingResponse, bool, error) {
+func (s *StubStore) CreateListing(key string, req apitypes.ListingRequest) (apitypes.ListingResponse, bool, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if id, ok := s.listingByKey[key]; ok {
 		record := s.listings[id]
 		if !reflect.DeepEqual(record.Request, req) {
-			return ListingResponse{}, false, ErrIdempotencyConflict
+			return apitypes.ListingResponse{}, false, ErrIdempotencyConflict
 		}
 		return record.Response, true, nil
 	}
 
 	listingID := fmt.Sprintf("lst-%s-%d", strings.ToLower(req.Platform), time.Now().UnixNano())
-	response := ListingResponse{
+	response := apitypes.ListingResponse{
 		ListingID:  listingID,
 		ExternalID: fmt.Sprintf("ext-%s", strings.ToUpper(req.SKU)),
 		Status:     "PENDING",
@@ -87,13 +89,13 @@ func (s *StubStore) CreateListing(key string, req ListingRequest) (ListingRespon
 	return response, false, nil
 }
 
-func (s *StubStore) GetListing(id string) (ListingResponse, bool) {
+func (s *StubStore) GetListing(id string) (apitypes.ListingResponse, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	record, ok := s.listings[id]
 	if !ok {
-		return ListingResponse{}, false
+		return apitypes.ListingResponse{}, false
 	}
 
 	if time.Since(record.CreatedAt) > 2*time.Second && record.Response.Status != "ACTIVE" {
@@ -104,30 +106,30 @@ func (s *StubStore) GetListing(id string) (ListingResponse, bool) {
 	return record.Response, true
 }
 
-func (s *StubStore) CreateOrder(key string, req OrderRequest) (OrderResponse, bool, error) {
+func (s *StubStore) CreateOrder(key string, req apitypes.OrderRequest) (apitypes.OrderResponse, bool, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if id, ok := s.orderByKey[key]; ok {
 		record := s.orders[id]
 		if !reflect.DeepEqual(record.Request, req) {
-			return OrderResponse{}, false, ErrIdempotencyConflict
+			return apitypes.OrderResponse{}, false, ErrIdempotencyConflict
 		}
 		return record.Response, true, nil
 	}
 
 	if listingID := req.ListingID; listingID != "" {
 		if _, ok := s.listings[listingID]; !ok {
-			return OrderResponse{}, false, ErrListingNotFound
+			return apitypes.OrderResponse{}, false, ErrListingNotFound
 		}
 	} else if sku := strings.ToLower(req.SKU); sku != "" {
 		if _, ok := s.listingBySKU[sku]; !ok {
-			return OrderResponse{}, false, ErrListingNotFound
+			return apitypes.OrderResponse{}, false, ErrListingNotFound
 		}
 	}
 
 	orderID := fmt.Sprintf("ord-%s-%d", strings.ToLower(req.Platform), time.Now().UnixNano())
-	response := OrderResponse{
+	response := apitypes.OrderResponse{
 		OrderID:    orderID,
 		ExternalID: fmt.Sprintf("ext-%s", strings.ToUpper(orderID)),
 		Status:     "PENDING",
@@ -145,13 +147,13 @@ func (s *StubStore) CreateOrder(key string, req OrderRequest) (OrderResponse, bo
 	return response, false, nil
 }
 
-func (s *StubStore) GetOrder(id string) (OrderResponse, bool) {
+func (s *StubStore) GetOrder(id string) (apitypes.OrderResponse, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	record, ok := s.orders[id]
 	if !ok {
-		return OrderResponse{}, false
+		return apitypes.OrderResponse{}, false
 	}
 
 	if time.Since(record.CreatedAt) > 2*time.Second && record.Response.Status != "CONFIRMED" {

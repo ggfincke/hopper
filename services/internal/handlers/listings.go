@@ -6,41 +6,11 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	apitypes "github.com/ggfincke/hopper/services/marketplace/internal/types"
 )
 
 const idempotencyHeader = "Idempotency-Key"
-
-type Media struct {
-	URL string `json:"url"`
-}
-
-type PricePayload struct {
-	Amount   string `json:"amount"`
-	Currency string `json:"currency"`
-}
-
-type ListingRequest struct {
-	Platform        string       `json:"platform"`
-	SellerAccountID string       `json:"sellerAccountId"`
-	SKU             string       `json:"sku"`
-	Title           string       `json:"title"`
-	Description     string       `json:"description,omitempty"`
-	Price           PricePayload `json:"price"`
-	Quantity        int          `json:"quantity"`
-	Media           []Media      `json:"media,omitempty"`
-}
-
-type ErrorDetail struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-type ListingResponse struct {
-	ListingID  string        `json:"listingId"`
-	ExternalID string        `json:"externalId,omitempty"`
-	Status     string        `json:"status"`
-	Errors     []ErrorDetail `json:"errors,omitempty"`
-}
 
 func CreateListing(store ListingStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +22,7 @@ func CreateListing(store ListingStore) http.HandlerFunc {
 			return
 		}
 
-		var req ListingRequest
+		var req apitypes.ListingRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			writeError(w, http.StatusBadRequest, "INVALID_REQUEST", "invalid JSON payload")
 			return
@@ -102,7 +72,7 @@ func GetListing(store ListingStore) http.HandlerFunc {
 	}
 }
 
-func validateListingRequest(req ListingRequest) error {
+func validateListingRequest(req apitypes.ListingRequest) error {
 	if strings.TrimSpace(req.Platform) == "" {
 		return errors.New("platform is required")
 	}
@@ -129,7 +99,7 @@ func validateListingRequest(req ListingRequest) error {
 	return nil
 }
 
-func validatePrice(pricePayload PricePayload, platform string) error {
+func validatePrice(pricePayload apitypes.PricePayload, platform string) error {
 	if strings.TrimSpace(pricePayload.Amount) == "" {
 		return errors.New("price.amount is required")
 	}

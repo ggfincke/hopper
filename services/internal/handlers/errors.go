@@ -3,21 +3,16 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+
+	apitypes "github.com/ggfincke/hopper/services/marketplace/internal/types"
 )
 
-type APIError struct {
-	Code              string      `json:"code"`
-	Message           string      `json:"message"`
-	Details           interface{} `json:"details,omitempty"`
-	RetryAfterSeconds int         `json:"retryAfterSeconds,omitempty"`
-}
-
 type errorEnvelope struct {
-	Error APIError `json:"error"`
+	Error apitypes.APIError `json:"error"`
 }
 
-func writeError(w http.ResponseWriter, status int, code, message string, opts ...func(*APIError)) {
-	apiErr := APIError{Code: code, Message: message}
+func writeError(w http.ResponseWriter, status int, code, message string, opts ...func(*apitypes.APIError)) {
+	apiErr := apitypes.APIError{Code: code, Message: message}
 	for _, opt := range opts {
 		opt(&apiErr)
 	}
@@ -27,8 +22,8 @@ func writeError(w http.ResponseWriter, status int, code, message string, opts ..
 	_ = json.NewEncoder(w).Encode(errorEnvelope{Error: apiErr})
 }
 
-func withRetryAfter(seconds int) func(*APIError) {
-	return func(apiErr *APIError) {
+func withRetryAfter(seconds int) func(*apitypes.APIError) {
+	return func(apiErr *apitypes.APIError) {
 		apiErr.RetryAfterSeconds = seconds
 	}
 }
