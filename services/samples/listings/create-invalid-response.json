@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "price.amount must be greater than zero"
+  }
+}

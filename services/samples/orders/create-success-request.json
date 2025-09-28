@@ -1,0 +1,26 @@
+{
+  "platform": "EBAY",
+  "sellerAccountId": "seller-123",
+  "listingId": "lst-ebay-1700000000000000000",
+  "buyer": {
+    "name": "Pat Buyer",
+    "address": {
+      "line1": "123 Market Street",
+      "city": "San Francisco",
+      "region": "CA",
+      "postal": "94103",
+      "country": "US"
+    }
+  },
+  "items": [
+    {
+      "sku": "SKU-001",
+      "quantity": 1,
+      "price": {
+        "amount": "19.95",
+        "currency": "USD"
+      }
+    }
+  ],
+  "idempotencyKey": "create-order-001"
+}

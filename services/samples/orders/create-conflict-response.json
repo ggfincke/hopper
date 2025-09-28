@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "CONFLICT",
+    "message": "idempotency key already used for a different payload"
+  }
+}
