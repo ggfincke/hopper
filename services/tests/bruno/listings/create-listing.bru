@@ -1,0 +1,12 @@
+meta:
+  name: Create Listing
+  type: http
+request:
+  method: POST
+  url: "{{host}}/v1/listings"
+  headers:
+    Content-Type: application/json
+    Idempotency-Key: "{{listingKey}}"
+  body:
+    type: json
+    file: ../../../samples/listings/create-success-request.json

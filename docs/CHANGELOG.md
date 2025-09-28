@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 2025-09-27
+
+### Added
+- **Go-based Marketplace Connector Service**: Complete microservice with HTTP handlers, type definitions, and order/listing management APIs
+- **API Testing Infrastructure**: Bruno HTTP collection, Go contract testing with schema validation, and comprehensive sample data
+- **OpenAPI 3.1 Specification**: Complete API documentation with detailed schemas and examples for the Go service
+
+### Changed
+- **Go Service Organization**: Consolidated shared types into centralized package and enhanced marketplace connector with order management
+- **Documentation**: Updated code comments and added comprehensive testing documentation
+
 ## 2025-09-26
 
 ### Added

@@ -1,0 +1,12 @@
+meta:
+  name: Create Order
+  type: http
+request:
+  method: POST
+  url: "{{host}}/v1/orders"
+  headers:
+    Content-Type: application/json
+    Idempotency-Key: "{{orderKey}}"
+  body:
+    type: json
+    file: ../../../samples/orders/create-success-request.json

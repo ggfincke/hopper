@@ -1,0 +1,17 @@
+{
+  "platform": "EBAY",
+  "sellerAccountId": "seller-123",
+  "sku": "SKU-001",
+  "title": "Vintage Travel Mug",
+  "description": "Stub listing for marketplace connector demo",
+  "price": {
+    "amount": "19.95",
+    "currency": "USD"
+  },
+  "quantity": 5,
+  "media": [
+    {
+      "url": "https://example.com/media/mug-front.jpg"
+    }
+  ]
+}

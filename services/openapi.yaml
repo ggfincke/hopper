@@ -1,0 +1,391 @@
+openapi: 3.1.1
+info:
+  title: Marketplace Connector API
+  version: 0.1.0
+  description: |
+    Starter contract for the marketplace connector stub service. Endpoints are
+    versioned under the `/v1` prefix and follow the error taxonomy outlined in the
+    marketplace flow plan.
+servers:
+  - url: http://localhost:8080
+    description: Local development
+paths:
+  /v1/health:
+    get:
+      summary: Health check
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /v1/listings:
+    post:
+      summary: Create listing
+      operationId: createListing
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingRequest'
+      responses:
+        '201':
+          description: Listing created
+          headers:
+            Idempotency-Key:
+              $ref: '#/components/headers/IdempotencyKey'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListingResponse'
+        '200':
+          description: Listing already created for the supplied idempotency key
+          headers:
+            Idempotency-Key:
+              $ref: '#/components/headers/IdempotencyKey'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListingResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '409':
+          description: Conflicting idempotency use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/UnknownError'
+  /v1/listings/{id}:
+    get:
+      summary: Fetch listing
+      operationId: getListing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Connector listing identifier returned from create
+      responses:
+        '200':
+          description: Listing retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListingResponse'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+  /v1/orders:
+    post:
+      summary: Create order
+      operationId: createOrder
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      responses:
+        '201':
+          description: Order created
+          headers:
+            Idempotency-Key:
+              $ref: '#/components/headers/IdempotencyKey'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '200':
+          description: Order already created for the supplied idempotency key
+          headers:
+            Idempotency-Key:
+              $ref: '#/components/headers/IdempotencyKey'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '409':
+          description: Conflicting idempotency use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/UnknownError'
+  /v1/orders/{id}:
+    get:
+      summary: Fetch order
+      operationId: getOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Connector order identifier returned from create
+      responses:
+        '200':
+          description: Order retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+components:
+  parameters:
+    IdempotencyKeyHeader:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Unique key supplied by the Java client to enforce idempotent create operations
+      schema:
+        type: string
+  headers:
+    IdempotencyKey:
+      description: Echoed idempotency key value
+      schema:
+        type: string
+  responses:
+    InvalidRequest:
+      description: Request failed validation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          examples:
+            validationFailure:
+              value:
+                error:
+                  code: INVALID_REQUEST
+                  message: price.amount must be greater than zero
+    ResourceNotFound:
+      description: Referenced resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          examples:
+            missingListing:
+              value:
+                error:
+                  code: NOT_FOUND
+                  message: listing not found
+    UnknownError:
+      description: Unclassified connector failure
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+      required:
+        - status
+        - service
+        - timestamp
+    ListingRequest:
+      type: object
+      properties:
+        platform:
+          type: string
+          description: Marketplace this request targets
+          enum: [EBAY, AMAZON]
+        sellerAccountId:
+          type: string
+        sku:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          $ref: '#/components/schemas/Price'
+        quantity:
+          type: integer
+          minimum: 1
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+      required:
+        - platform
+        - sellerAccountId
+        - sku
+        - title
+        - price
+        - quantity
+    ListingResponse:
+      type: object
+      properties:
+        listingId:
+          type: string
+        externalId:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, ACTIVE, FAILED]
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+      required:
+        - listingId
+        - status
+    OrderRequest:
+      type: object
+      properties:
+        platform:
+          type: string
+          enum: [EBAY, AMAZON]
+        sellerAccountId:
+          type: string
+        listingId:
+          type: string
+        sku:
+          type: string
+        buyer:
+          $ref: '#/components/schemas/Buyer'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        idempotencyKey:
+          type: string
+      required:
+        - platform
+        - sellerAccountId
+        - buyer
+        - items
+    OrderResponse:
+      type: object
+      properties:
+        orderId:
+          type: string
+        externalId:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, CONFIRMED, FAILED]
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+      required:
+        - orderId
+        - status
+    Buyer:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+      required:
+        - name
+        - address
+    Address:
+      type: object
+      properties:
+        line1:
+          type: string
+        city:
+          type: string
+        region:
+          type: string
+        postal:
+          type: string
+        country:
+          type: string
+      required:
+        - line1
+        - city
+        - region
+        - postal
+        - country
+    OrderItem:
+      type: object
+      properties:
+        sku:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        price:
+          $ref: '#/components/schemas/Price'
+      required:
+        - sku
+        - quantity
+        - price
+    Price:
+      type: object
+      properties:
+        amount:
+          type: string
+          pattern: '^[0-9]+(\.[0-9]{1,2})?$'
+        currency:
+          type: string
+          enum: [USD, EUR, GBP, CAD, AUD]
+      required:
+        - amount
+        - currency
+    Media:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+      required:
+        - url
+    ErrorDetail:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+    ErrorEnvelope:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              nullable: true
+            retryAfterSeconds:
+              type: integer
+          required:
+            - code
+            - message
+      required:
+        - error
