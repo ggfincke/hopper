@@ -1,10 +1,12 @@
 package dev.fincke.hopper.order.order.exception;
 
+import dev.fincke.hopper.api.error.BadRequestException;
+
 import java.util.List;
 import java.util.UUID;
 
 // Domain exception for order validation failures (business rule violations)
-public class OrderValidationException extends RuntimeException
+public class OrderValidationException extends BadRequestException
 {
     
     // Context information for validation failure
