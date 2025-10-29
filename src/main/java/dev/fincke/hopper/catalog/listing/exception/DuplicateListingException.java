@@ -1,9 +1,11 @@
 package dev.fincke.hopper.catalog.listing.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 import java.util.UUID;
 
 // Exception thrown when external listing ID already exists on platform
-public class DuplicateListingException extends RuntimeException 
+public class DuplicateListingException extends ConflictException 
 {
     // * Attributes
     

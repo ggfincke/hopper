@@ -1,9 +1,11 @@
 package dev.fincke.hopper.catalog.listing.exception;
 
+import dev.fincke.hopper.api.error.BadRequestException;
+
 import java.util.UUID;
 
 // Exception thrown for invalid listing status or disallowed status transitions
-public class InvalidListingStatusException extends RuntimeException 
+public class InvalidListingStatusException extends BadRequestException 
 {
     // * Attributes
     
