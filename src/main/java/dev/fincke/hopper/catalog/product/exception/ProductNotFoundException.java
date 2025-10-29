@@ -1,10 +1,12 @@
 package dev.fincke.hopper.catalog.product.exception;
 
+import dev.fincke.hopper.api.error.NotFoundException;
+
 import java.util.UUID;
 
 // Signals that a requested product could not be found.
 // Allows callers to translate missing resources into appropriate API responses.
-public class ProductNotFoundException extends RuntimeException 
+public class ProductNotFoundException extends NotFoundException 
 {
     // * Attributes
     

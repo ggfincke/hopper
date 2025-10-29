@@ -1,8 +1,10 @@
 package dev.fincke.hopper.catalog.product.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 // Raised when a product create/update reuses an existing SKU.
 // Enforces SKU uniqueness so downstream systems see one product per identifier.
-public class DuplicateSkuException extends RuntimeException 
+public class DuplicateSkuException extends ConflictException 
 {
     // * Attributes
     
