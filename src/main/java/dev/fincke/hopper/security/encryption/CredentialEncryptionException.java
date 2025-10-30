@@ -1,7 +1,9 @@
 package dev.fincke.hopper.security.encryption;
 
+import dev.fincke.hopper.api.error.ServerErrorException;
+
 // Base type for surfacing encryption system failures up through service layers
-public class CredentialEncryptionException extends RuntimeException 
+public class CredentialEncryptionException extends ServerErrorException 
 {
     // * Constructors
 
