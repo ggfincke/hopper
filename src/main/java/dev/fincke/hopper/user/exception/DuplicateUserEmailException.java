@@ -1,7 +1,9 @@
 package dev.fincke.hopper.user.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 // Domain exception for email uniqueness violations
-public class DuplicateUserEmailException extends RuntimeException
+public class DuplicateUserEmailException extends ConflictException
 {
     
     // Email that caused the conflict

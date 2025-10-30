@@ -1,9 +1,11 @@
 package dev.fincke.hopper.user.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 import java.util.UUID;
 
 // Raised when a user cannot be removed because prerequisites (such as disabling the account) are not met
-public class UserDeletionNotAllowedException extends RuntimeException
+public class UserDeletionNotAllowedException extends ConflictException
 {
     // ID of the user that cannot be deleted
     private final UUID userId;

@@ -1,7 +1,9 @@
 package dev.fincke.hopper.user.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 // Domain exception for username uniqueness violations
-public class DuplicateUsernameException extends RuntimeException
+public class DuplicateUsernameException extends ConflictException
 {
     
     // Username that caused the conflict
