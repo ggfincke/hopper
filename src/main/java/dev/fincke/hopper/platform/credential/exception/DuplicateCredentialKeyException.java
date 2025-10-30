@@ -1,9 +1,11 @@
 package dev.fincke.hopper.platform.credential.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 import java.util.UUID;
 
 // Exception thrown when attempting to create a credential with a duplicate platform+key combination
-public class DuplicateCredentialKeyException extends RuntimeException 
+public class DuplicateCredentialKeyException extends ConflictException 
 {
     // * Attributes
     
