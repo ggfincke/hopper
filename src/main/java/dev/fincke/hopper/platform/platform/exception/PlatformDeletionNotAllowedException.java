@@ -1,9 +1,11 @@
 package dev.fincke.hopper.platform.platform.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 import java.util.UUID;
 
 // Raised when a platform cannot be removed because other records still depend on it
-public class PlatformDeletionNotAllowedException extends RuntimeException
+public class PlatformDeletionNotAllowedException extends ConflictException
 {
     // ID of the platform that cannot be deleted
     private final UUID platformId;

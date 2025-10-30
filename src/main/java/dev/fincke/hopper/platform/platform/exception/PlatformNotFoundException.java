@@ -1,9 +1,11 @@
 package dev.fincke.hopper.platform.platform.exception;
 
+import dev.fincke.hopper.api.error.NotFoundException;
+
 import java.util.UUID;
 
 // Exception thrown when a requested platform cannot be found
-public class PlatformNotFoundException extends RuntimeException 
+public class PlatformNotFoundException extends NotFoundException 
 {
     // * Attributes
     

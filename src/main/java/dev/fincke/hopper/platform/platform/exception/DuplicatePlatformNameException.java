@@ -1,7 +1,9 @@
 package dev.fincke.hopper.platform.platform.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 // Business rule exception for duplicate platform names (carries name for context)
-public class DuplicatePlatformNameException extends RuntimeException
+public class DuplicatePlatformNameException extends ConflictException
 {
     
     // The duplicate name that caused the conflict
