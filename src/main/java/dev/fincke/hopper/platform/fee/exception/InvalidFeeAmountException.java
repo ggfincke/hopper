@@ -1,9 +1,11 @@
 package dev.fincke.hopper.platform.fee.exception;
 
+import dev.fincke.hopper.api.error.BadRequestException;
+
 import java.math.BigDecimal;
 
 // Exception thrown when platform fee amount violates business rules
-public class InvalidFeeAmountException extends RuntimeException
+public class InvalidFeeAmountException extends BadRequestException
 {
     // * Constructors
     

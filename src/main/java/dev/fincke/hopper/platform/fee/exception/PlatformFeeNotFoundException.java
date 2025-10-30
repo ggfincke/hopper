@@ -1,9 +1,11 @@
 package dev.fincke.hopper.platform.fee.exception;
 
+import dev.fincke.hopper.api.error.NotFoundException;
+
 import java.util.UUID;
 
 // Exception thrown when platform fee cannot be found by ID
-public class PlatformFeeNotFoundException extends RuntimeException
+public class PlatformFeeNotFoundException extends NotFoundException
 {
     // * Constructors
     
