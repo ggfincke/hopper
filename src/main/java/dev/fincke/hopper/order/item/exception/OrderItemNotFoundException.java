@@ -1,9 +1,11 @@
 package dev.fincke.hopper.order.item.exception;
 
+import dev.fincke.hopper.api.error.NotFoundException;
+
 import java.util.UUID;
 
 // Exception thrown when order item cannot be found by ID
-public class OrderItemNotFoundException extends RuntimeException
+public class OrderItemNotFoundException extends NotFoundException
 {
     // * Constructors
     
