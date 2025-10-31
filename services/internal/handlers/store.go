@@ -26,6 +26,7 @@ type OrderStore interface {
 	GetOrder(id string) (apitypes.OrderResponse, bool)
 }
 
+// StubStore mimics downstream marketplace persistence until eBay/TCGPlayer connectors are implemented.
 type StubStore struct {
 	mu           sync.RWMutex
 	listings     map[string]listingRecord
