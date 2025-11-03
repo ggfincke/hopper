@@ -1,0 +1,124 @@
+networks:
+  hopper-dev:
+    driver: bridge
+
+volumes:
+  pgdata:
+  gradle-cache:
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: hopper-db
+    restart: unless-stopped
+    env_file:
+      - env/db.env
+    environment:
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/db/init.sql:/docker-entrypoint-initdb.d/10-init.sql:ro
+      - ./src/main/resources/db/migration:/opt/migrations:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - hopper-dev
+
+  marketplace:
+    build:
+      context: ./services
+      dockerfile: Dockerfile.marketplace
+    container_name: hopper-marketplace
+    restart: unless-stopped
+    env_file:
+      - env/marketplace.env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./services/samples:/app/samples:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8090/v1/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - hopper-dev
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: hopper-api
+    restart: unless-stopped
+    env_file:
+      - env/api.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hopper
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    volumes:
+      - gradle-cache:/home/hopper/.gradle
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/actuator/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - hopper-dev
+
+  frontend:
+    image: node:22-alpine
+    container_name: hopper-frontend
+    profiles:
+      - frontend
+    working_dir: /app
+    env_file:
+      - env/frontend.env
+    command: sh -c "if [ -f package.json ]; then npm install && npm run dev -- --host 0.0.0.0 --port 5173; else echo 'Missing frontend app directory. Scaffold one (e.g., npm create vite@latest frontend) before enabling this service.' && sleep infinity; fi"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      api:
+        condition: service_started
+    networks:
+      - hopper-dev
+
+  seed:
+    image: flyway/flyway:10-alpine
+    container_name: hopper-seed
+    profiles:
+      - seed
+    env_file:
+      - env/api.env
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      flyway
+      -url="${DATABASE_URL:-jdbc:postgresql://db:5432/hopper}"
+      -user="${DATABASE_USERNAME:-hopper_user}"
+      -password="${DATABASE_PASSWORD:-dev_password}"
+      -locations=filesystem:/flyway/sql
+      -connectRetries=60
+      migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src/main/resources/db/migration:/flyway/sql:ro
+    networks:
+      - hopper-dev
