@@ -1,0 +1,30 @@
+# syntax=docker/dockerfile:1.7
+
+FROM eclipse-temurin:21-jdk AS build
+WORKDIR /workspace
+
+COPY gradlew gradlew
+COPY gradle gradle
+COPY build.gradle settings.gradle ./
+COPY src src
+RUN chmod +x gradlew
+RUN --mount=type=cache,target=/root/.gradle ./gradlew --no-daemon clean bootJar
+
+FROM eclipse-temurin:21-jdk-alpine AS runtime
+WORKDIR /workspace
+
+RUN apk add --no-cache curl && \
+    addgroup -S hopper && adduser -S hopper -G hopper && \
+    mkdir -p /home/hopper/.gradle && \
+    chown -R hopper:hopper /home/hopper
+
+COPY --from=build /workspace /workspace
+RUN cp build/libs/*.jar /workspace/app.jar && \
+    chown -R hopper:hopper /workspace
+
+ENV SPRING_PROFILES_ACTIVE=prod \
+    JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+
+EXPOSE 8080
+USER hopper
+ENTRYPOINT ["java","-jar","app.jar"]
