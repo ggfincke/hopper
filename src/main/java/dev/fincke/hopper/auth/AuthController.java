@@ -312,7 +312,6 @@ public class AuthController
             // Extract token information
             UUID userId = jwtUtils.getUserIdFromToken(token);
             String username = jwtUtils.getUsernameFromToken(token);
-            String email = jwtUtils.getEmailFromToken(token);
             Date expiration = jwtUtils.getExpirationFromToken(token);
             
             if (userId == null || username == null || expiration == null)
