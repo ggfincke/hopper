@@ -178,7 +178,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter
     
     // Skip JWT authentication for public endpoints
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request)
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request)
     {
         String path = request.getRequestURI();
         

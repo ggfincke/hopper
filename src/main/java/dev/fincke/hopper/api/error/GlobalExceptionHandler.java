@@ -139,7 +139,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     // --- Framework-level overrides -----------------------------------------------------------
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException ex,
                                                                   @NonNull HttpHeaders headers,
                                                                   @NonNull HttpStatusCode status,
                                                                   @NonNull WebRequest request) {
@@ -158,7 +158,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(@NonNull HttpMessageNotReadableException ex,
                                                                   @NonNull HttpHeaders headers,
                                                                   @NonNull HttpStatusCode status,
                                                                   @NonNull WebRequest request) {
@@ -169,18 +169,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex,
+    protected ResponseEntity<Object> handleTypeMismatch(@NonNull TypeMismatchException ex,
                                                         @NonNull HttpHeaders headers,
                                                         @NonNull HttpStatusCode status,
                                                         @NonNull WebRequest request) {
         String message = "Invalid parameter value";
-        if (ex instanceof MethodArgumentTypeMismatchException mismatch &&
-            mismatch.getName() != null &&
-            mismatch.getRequiredType() != null) {
-            message = "Parameter '%s' must be of type %s".formatted(
-                mismatch.getName(),
-                mismatch.getRequiredType().getSimpleName()
-            );
+        if (ex instanceof MethodArgumentTypeMismatchException mismatch) {
+            String parameterName = mismatch.getName();
+            Class<?> requiredType = mismatch.getRequiredType();
+            if (parameterName != null && requiredType != null) {
+                message = "Parameter '%s' must be of type %s".formatted(
+                    parameterName,
+                    requiredType.getSimpleName()
+                );
+            }
         }
 
         logger.debug("Parameter type mismatch: {}", ex.getMessage());
@@ -189,10 +191,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
-                                                                          @NonNull HttpHeaders headers,
-                                                                          @NonNull HttpStatusCode status,
-                                                                          @NonNull WebRequest request) {
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+        @NonNull MissingServletRequestParameterException ex,
+        @NonNull HttpHeaders headers,
+        @NonNull HttpStatusCode status,
+        @NonNull WebRequest request) {
         String message = "Missing required parameter '%s'".formatted(ex.getParameterName());
         logger.debug(message);
         ApiErrorResponse body = ApiErrorResponse.of(HttpStatus.BAD_REQUEST, message, resolvePath(request));
@@ -200,7 +203,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex,
+    protected ResponseEntity<Object> handleMissingServletRequestPart(@NonNull MissingServletRequestPartException ex,
                                                                      @NonNull HttpHeaders headers,
                                                                      @NonNull HttpStatusCode status,
                                                                      @NonNull WebRequest request) {
@@ -211,10 +214,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
-                                                                         @NonNull HttpHeaders headers,
-                                                                         @NonNull HttpStatusCode status,
-                                                                         @NonNull WebRequest request) {
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+        @NonNull HttpRequestMethodNotSupportedException ex,
+        @NonNull HttpHeaders headers,
+        @NonNull HttpStatusCode status,
+        @NonNull WebRequest request) {
         String message = "HTTP method %s is not supported for this endpoint".formatted(ex.getMethod());
         logger.debug(message);
         ApiErrorResponse body = ApiErrorResponse.of(HttpStatus.METHOD_NOT_ALLOWED, message, resolvePath(request));
@@ -222,7 +226,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex,
+    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(@NonNull HttpMediaTypeNotSupportedException ex,
                                                                      @NonNull HttpHeaders headers,
                                                                      @NonNull HttpStatusCode status,
                                                                      @NonNull WebRequest request) {
@@ -240,10 +244,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex,
-                                                                      @NonNull HttpHeaders headers,
-                                                                      @NonNull HttpStatusCode status,
-                                                                      @NonNull WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(
+        @NonNull HttpMediaTypeNotAcceptableException ex,
+        @NonNull HttpHeaders headers,
+        @NonNull HttpStatusCode status,
+        @NonNull WebRequest request) {
         String message = "Requested media type is not acceptable";
         logger.debug(message);
         ApiErrorResponse body = ApiErrorResponse.of(HttpStatus.NOT_ACCEPTABLE, message,
@@ -252,7 +257,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex,
+    protected ResponseEntity<Object> handleNoHandlerFoundException(@NonNull NoHandlerFoundException ex,
                                                                    @NonNull HttpHeaders headers,
                                                                    @NonNull HttpStatusCode status,
                                                                    @NonNull WebRequest request) {
