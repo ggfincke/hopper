@@ -11,7 +11,8 @@ build/
 .classpath
 .factorypath
 .project
-.settings
+.settings/*
+!.settings/org.eclipse.buildship.core.prefs
 .springBeans
 .sts4-cache
 bin/
