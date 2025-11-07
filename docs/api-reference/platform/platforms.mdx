@@ -1,0 +1,42 @@
+---
+title: "Platforms"
+description: "Marketplace platform registry and lookup endpoints"
+---
+
+The platform registry (`/api/platforms`) tracks marketplaces (e.g., eBay, Amazon, Shopify) that Hopper integrates with. Each record contains a `name` and `platformType` string.
+
+## Data shapes
+
+```json
+// PlatformCreateRequest
+{
+  "name": "eBay US",
+  "platformType": "MARKETPLACE"
+}
+
+// PlatformResponse
+{
+  "id": "c2a393da-5ef5-4c35-9b65-22a932224b7f",
+  "name": "eBay US",
+  "platformType": "MARKETPLACE"
+}
+```
+
+## Endpoints
+
+| Method & Path | Description |
+|---------------|-------------|
+| `POST /api/platforms` | Create a platform. Returns `201` and `PlatformResponse`. |
+| `PUT /api/platforms/{id}` | Update `name` and/or `platformType`. |
+| `GET /api/platforms/{id}` | Retrieve by UUID. |
+| `GET /api/platforms` | List all platforms. |
+| `DELETE /api/platforms/{id}` | Remove a platform (`204`). |
+
+### Filtered GET variants
+
+Spring maps the following query-parameter combinations to dedicated controller methods:
+
+- `GET /api/platforms?platformType={type}` → `List<PlatformResponse>`
+- `GET /api/platforms?name={exactName}` → single `PlatformResponse`
+
+`platformType` is case-insensitive; consider normalizing values when storing them.
