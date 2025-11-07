@@ -1,0 +1,18 @@
+---
+title: "Hopper API"
+description: "Reference docs for the Hopper Spring Boot services"
+---
+
+## What’s inside
+
+Hopper is a modular Spring Boot application that exposes RESTful endpoints for authentication, user management, catalog administration, platform integrations, and order fulfillment. This documentation mirrors the code packages so you can jump from `/src/main/java/dev/fincke/hopper/**` directly into the corresponding guide in `/docs/api-reference/**`.
+
+- `/api-reference/overview` – base URL, auth model, pagination, and error payloads
+- `/api-reference/api/health` – anonymous readiness endpoint used by load balancers
+- `/api-reference/auth/*` – JWT login, refresh, logout, session inspection, and validation helpers
+- `/api-reference/user/users` – user CRUD plus password, role, and account state workflows
+- `/api-reference/platform/*` – platform registry, per-platform credentials, and fee bookkeeping
+- `/api-reference/catalog/*` – product catalog and marketplace listings (with pageable queries)
+- `/api-reference/order/*` – buyers, orders, order items, and shipping addresses
+
+All pages use MDX so you can embed live examples, callouts, and component-driven descriptions as the project grows. Contributions should keep the file layout in sync with the Spring packages to stay discoverable.
