@@ -1,0 +1,87 @@
+---
+title: "API Overview"
+description: "Base URL, authentication, pagination, and error contracts for Hopper"
+---
+
+## Base URL
+
+| Environment | URL | Notes |
+|-------------|-----|-------|
+| Local development | `http://localhost:8080` | Spring Boot default port when running `./gradlew bootRun` |
+
+All first-class resources live under the `/api` prefix (for example, `GET /api/users`). The only anonymous endpoint outside that prefix is `GET /healthz`.
+
+## Authentication
+
+Hopper issues JWT access and refresh tokens through the [`POST /api/auth/login`](../auth/authentication#post-apiauthlogin) endpoint. Most `/api/**` routes require a valid access token supplied via the `Authorization` header.
+
+```
+Authorization: Bearer <access-token>
+Content-Type: application/json
+Accept: application/json
+```
+
+- Access tokens expire according to `JwtProperties#accessTokenExpirationMs`.
+- Refresh tokens are returned in both the JSON payload and a secure HTTP-only cookie named after `JwtProperties#refreshTokenCookieName`.
+- Tokens encode the user id, username, email, and granted `RoleType`s (`ADMIN`, `USER`, `API_CLIENT`).
+
+See [`/api/auth/refresh`](../auth/authentication#post-apiauthrefresh) for silent renewal and [`/api/auth/validate`](../auth/authentication#post-apiauthvalidate) for token introspection.
+
+## Pagination & sorting
+
+Endpoints that return `Page<T>` (products, listings, and some search results) accept the standard Spring Data query parameters:
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `page` | 0-indexed page number | `0` |
+| `size` | Page size | Controller default (usually `20`) |
+| `sort` | `<property>,<direction>` (repeatable) | Unsorted |
+
+Example: `GET /api/products?page=1&size=10&sort=name,asc&sort=price,desc`
+
+The JSON payload follows Spring’s pagination schema:
+
+```json
+{
+  "content": [/* array of ProductResponse */],
+  "pageable": {...},
+  "totalElements": 42,
+  "totalPages": 5,
+  "size": 10,
+  "number": 1,
+  "sort": {...},
+  "last": false,
+  "first": false,
+  "numberOfElements": 10,
+  "empty": false
+}
+```
+
+## Error payloads
+
+All exceptions funnel through `GlobalExceptionHandler` and produce the `ApiErrorResponse` contract:
+
+```json
+{
+  "timestamp": "2024-05-06T14:12:09.457Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Validation failed",
+  "errors": {
+    "email": "Email must be a valid email address",
+    "password": "Password must be at least 8 characters"
+  },
+  "path": "/api/users"
+}
+```
+
+- `status` mirrors the HTTP status code.
+- `message` surfaces the top-level error.
+- `errors` contains field-level validation failures when applicable.
+
+## Data conventions
+
+- Identifiers are UUIDv4 strings (`"3fa85f64-5717-4562-b3fc-2c963f66afa6"`).
+- Currency values are serialized as strings that represent decimal numbers with two fractional digits.
+- `orderDate`, `statusChangeDate`, and timestamps in responses use ISO-8601 format (`2024-01-31T18:22:05Z`).
+- Query filters that accept enums (`roleType`, `feeType`, `status`) are case-insensitive but documented using uppercase snake case for clarity.
