@@ -1,0 +1,74 @@
+---
+title: "Orders"
+description: "Order import, update, status, assignment, and maintenance endpoints"
+---
+
+Orders capture marketplace transactions, tying together platforms, buyers, order items, addresses, and platform fees.
+
+## Data shapes
+
+```json
+// OrderCreateRequest
+{
+  "platformId": "c2a393da-5ef5-4c35-9b65-22a932224b7f",
+  "externalOrderId": "AMZ-5567990",
+  "status": "pending",
+  "totalAmount": "129.99",
+  "orderDate": "2024-05-05T14:22:00Z",
+  "buyerId": "e278095c-941d-4865-90bf-91b05ba44fa3"
+}
+
+// OrderResponse
+{
+  "id": "9c14a5c3-182e-4781-8ad3-65a2f77f5f71",
+  "platformId": "c2a393da-5ef5-4c35-9b65-22a932224b7f",
+  "platformName": "Amazon",
+  "buyerId": "e278095c-941d-4865-90bf-91b05ba44fa3",
+  "buyerName": "Casey Lee",
+  "buyerEmail": "casey@example.com",
+  "externalOrderId": "AMZ-5567990",
+  "status": "pending",
+  "totalAmount": "129.99",
+  "orderDate": "2024-05-05T14:22:00Z"
+}
+```
+
+`OrderStatusUpdateRequest` enforces one of: `pending`, `confirmed`, `paid`, `processing`, `shipped`, `delivered`, `cancelled`, `refunded`.
+
+## CRUD & filters
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/orders` | Returns every order (non-pageable list). |
+| `GET /api/orders/{id}` | Fetch by UUID; returns `404` if not found. |
+| `GET /api/orders/status/{status}` | Filter by status (case-insensitive). |
+| `GET /api/orders/buyer/{buyerId}` | All orders for a buyer. |
+| `POST /api/orders` | Create an order (`201`). |
+| `PUT /api/orders/{id}` | Full update via `OrderUpdateRequest`. |
+| `DELETE /api/orders/{id}` | Delete (`204`). |
+
+## Status changes
+
+### `PATCH /api/orders/{id}/status`
+
+Payload: `OrderStatusUpdateRequest` (`status`, optional `statusChangeDate`, optional `reason`). Defaults the timestamp to “now” if omitted.
+
+```json
+{
+  "status": "shipped",
+  "statusChangeDate": "2024-05-06T10:11:12Z",
+  "reason": "Tracking #1Z999 delivered to carrier"
+}
+```
+
+## Buyer assignments
+
+- `PUT /api/orders/{orderId}/buyer/{buyerId}` → attach a buyer.
+- `DELETE /api/orders/{orderId}/buyer` → remove the buyer association.
+
+Both return the updated `OrderResponse`.
+
+## Maintenance helpers
+
+- `PUT /api/orders/{id}/recalculate-total` recalculates `totalAmount` from the associated order items and saves the order.
+- Validation errors throw `OrderValidationException` and surface as a `400` with the standard `ApiErrorResponse`.
