@@ -1,0 +1,50 @@
+---
+title: "Order Addresses"
+description: "Shipping addresses attached to orders"
+---
+
+Order addresses capture the final shipping destination for an order. Validation enforces non-empty address lines and US-style ZIP codes.
+
+## Data shapes
+
+```json
+// OrderAddressCreateRequest
+{
+  "orderId": "9c14a5c3-182e-4781-8ad3-65a2f77f5f71",
+  "street": "123 Market St",
+  "city": "San Francisco",
+  "state": "CA",
+  "postalCode": "94105",
+  "country": "US"
+}
+
+// OrderAddressResponse
+{
+  "id": "2fb3158b-92e0-4aa2-a5dd-0245481ec8b1",
+  "orderId": "9c14a5c3-182e-4781-8ad3-65a2f77f5f71",
+  "street": "123 Market St",
+  "city": "San Francisco",
+  "state": "CA",
+  "postalCode": "94105",
+  "country": "US"
+}
+```
+
+## Endpoints
+
+| Method & Path | Description |
+|---------------|-------------|
+| `POST /api/order-addresses` | Create a shipping address (`201`). |
+| `PUT /api/order-addresses/{id}` | Update via `OrderAddressUpdateRequest`. |
+| `GET /api/order-addresses` | List every address. |
+| `GET /api/order-addresses/{id}` | Fetch by UUID. |
+| `DELETE /api/order-addresses/{id}` | Delete (`204`). |
+
+### Queries & utilities
+
+- `GET /api/order-addresses/order/{orderId}` → address for a given order.
+- `GET /api/order-addresses/city/{city}` → addresses in a city.
+- `GET /api/order-addresses/state/{state}` → addresses in a state/region.
+- `GET /api/order-addresses/postal/{postalCode}` → addresses with a postal code.
+- `GET /api/order-addresses/exists/order/{orderId}` → boolean, helpful for idempotent importers.
+- `POST /api/order-addresses/{id}/validate` → runs domain validation logic and returns `200 OK` if successful.
