@@ -1,0 +1,52 @@
+---
+title: "Products"
+description: "Inventory catalog endpoints powering listings and orders"
+---
+
+Products describe the sellable items in Hopper. Listings and orders reference products via UUID.
+
+## Data shapes
+
+```json
+// ProductCreateRequest
+{
+  "sku": "SKU-001",
+  "name": "Vintage Jacket",
+  "description": "Premium denim jacket",
+  "price": "89.99",
+  "quantity": 25
+}
+
+// ProductResponse
+{
+  "id": "8d5f2657-1b42-431c-9d7c-70579015bb32",
+  "sku": "SKU-001",
+  "name": "Vintage Jacket",
+  "description": "Premium denim jacket",
+  "price": "89.99",
+  "quantity": 25
+}
+```
+
+## Endpoints
+
+| Method & Path | Description |
+|---------------|-------------|
+| `POST /api/products` | Create a product (`201 Created`). |
+| `GET /api/products` | Pageable list (`page`, `size`, `sort`). |
+| `GET /api/products/{id}` | Retrieve by UUID. |
+| `PUT /api/products/{id}` | Update fields via `ProductUpdateRequest`. |
+| `DELETE /api/products/{id}` | Delete (`204`). |
+
+### Derived queries
+
+- `GET /api/products/sku/{sku}` → fetch by SKU (exact match).
+- `GET /api/products/search?name=hoodie` → case-insensitive name search (pageable).
+- `GET /api/products/low-stock?threshold=5` → products below the threshold (pageable).
+
+### Stock adjustments
+
+`PATCH /api/products/{id}/stock?adjustment=-2`
+
+- Accepts positive or negative adjustments (must keep stock ≥ 0).
+- Returns the updated `ProductResponse`.
