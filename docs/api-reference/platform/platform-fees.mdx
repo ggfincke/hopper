@@ -1,0 +1,61 @@
+---
+title: "Platform Fees"
+description: "Fee ledger tied to orders and platforms"
+---
+
+Platform fees capture transaction, processing, listing, or final-value fees assessed by partner marketplaces.
+
+## Data shapes
+
+```json
+// PlatformFeeCreateRequest
+{
+  "orderId": "9c14a5c3-182e-4781-8ad3-65a2f77f5f71",
+  "feeType": "transaction",
+  "amount": "3.25"
+}
+
+// PlatformFeeResponse
+{
+  "id": "c5397b65-43d0-40ee-8c64-22567a31b8aa",
+  "orderId": "9c14a5c3-182e-4781-8ad3-65a2f77f5f71",
+  "externalOrderId": "AMZ-5567990",
+  "platformId": "c2a393da-5ef5-4c35-9b65-22a932224b7f",
+  "platformName": "Amazon",
+  "feeType": "transaction",
+  "amount": "3.25"
+}
+```
+
+## CRUD
+
+| Method & Path | Description |
+|---------------|-------------|
+| `GET /api/platform-fees` | Returns `List<PlatformFeeResponse>` filtered with the parameters below. |
+| `GET /api/platform-fees/{id}` | Fetch a single fee (`404` if not found). |
+| `POST /api/platform-fees` | Create a fee (`201`). |
+| `PUT /api/platform-fees/{id}` | Update `orderId`, `feeType`, and/or `amount`. |
+| `DELETE /api/platform-fees/{id}` | Remove a fee (`204`). |
+
+### Query parameters
+
+Combine the parameters that match your use case; the controller selects the tightest filter based on what you supply.
+
+| Parameter | Example | Behavior |
+|-----------|---------|----------|
+| `orderId` | `/api/platform-fees?orderId=...` | Fees belonging to the order |
+| `feeType` | `/api/platform-fees?feeType=transaction` | Case-insensitive type filter |
+| `minAmount` / `maxAmount` | `/api/platform-fees?minAmount=1.00&maxAmount=5.00` | Inclusive range |
+| `platformId` | `/api/platform-fees?platformId=...` | Fees for a platform |
+| `platformName` | `/api/platform-fees?platformName=Amazon` | Case-insensitive match |
+
+When both `orderId` and `feeType` are supplied, Hopper uses `findByOrderAndFeeType`. `minAmount` without `maxAmount` performs a “greater-than-or-equal” query and vice versa.
+
+## Aggregates & maintenance
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/platform-fees/totals/by-order/{orderId}` | Decimal sum of all fees tied to the order. |
+| `GET /api/platform-fees/totals/by-type/{feeType}` | Sum grouped by fee type. |
+| `GET /api/platform-fees/totals/by-platform/{platformId}` | Sum for a single platform. |
+| `DELETE /api/platform-fees/by-order/{orderId}` | Bulk-delete all fees belonging to an order (useful for re-imports). |
