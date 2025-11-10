@@ -1,0 +1,40 @@
+---
+title: "Buyers"
+description: "Customer records that orders reference"
+---
+
+Buyers store contact information and are referenced by orders for analytics and fulfillment. Emails are normalized to lowercase automatically.
+
+## Data shapes
+
+```json
+// BuyerCreateRequest
+{
+  "email": "casey@example.com",
+  "name": "Casey Lee"
+}
+
+// BuyerResponse
+{
+  "id": "e278095c-941d-4865-90bf-91b05ba44fa3",
+  "email": "casey@example.com",
+  "name": "Casey Lee"
+}
+```
+
+## Endpoints
+
+| Method & Path | Description |
+|---------------|-------------|
+| `POST /api/buyers` | Create a buyer (`201`). |
+| `PUT /api/buyers/{id}` | Update via `BuyerUpdateRequest`. |
+| `GET /api/buyers/{id}` | Fetch by UUID. |
+| `GET /api/buyers` | List all buyers. |
+| `DELETE /api/buyers/{id}` | Delete (`204`). |
+
+### Queries & utilities
+
+- `GET /api/buyers/email/{email}` → fetch by normalized email.
+- `GET /api/buyers/search/{name}` → case-insensitive partial name match.
+- `GET /api/buyers/exists/email/{email}` → returns `true` if the email already exists.
+- `POST /api/buyers/{id}/validate` → runs domain validations (useful after batch updates).
