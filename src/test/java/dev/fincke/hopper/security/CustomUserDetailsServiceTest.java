@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 // Tests Spring Security integration for user authentication and principal creation
 // Enables Mockito framework for dependency injection testing
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("null")
 class CustomUserDetailsServiceTest
 {
     // * Test Dependencies

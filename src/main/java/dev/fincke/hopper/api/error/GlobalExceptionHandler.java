@@ -40,6 +40,7 @@ import java.util.Map;
  * Converts application and framework exceptions into structured JSON responses for clients.
  */
 @RestControllerAdvice
+@SuppressWarnings("null")
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);

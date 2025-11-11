@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 // Service implementation for platform business operations
 @Service
 @Transactional(readOnly = true) // default to read-only transactions for better performance
+@SuppressWarnings("null")
 public class PlatformServiceImpl implements PlatformService 
 {
     // * Dependencies

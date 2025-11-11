@@ -41,6 +41,7 @@ import static org.mockito.Mockito.*;
 // Tests complex order management including validation, referential integrity, and buyer relationships
 // Enables Mockito framework for dependency injection testing
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("null")
 class OrderServiceImplTest
 {
     // * Test Dependencies

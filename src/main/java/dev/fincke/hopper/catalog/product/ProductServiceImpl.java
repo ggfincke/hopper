@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 // Service implementation for product business operations
 @Service
 @Transactional(readOnly = true) // default to read-only transactions
+@SuppressWarnings("null")
 public class ProductServiceImpl implements ProductService 
 {
     // * Dependencies

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 // Spring service with read-only transactions by default
 @Service
 @Transactional(readOnly = true)
+@SuppressWarnings("null")
 public class OrderAddressServiceImpl implements OrderAddressService
 {
     

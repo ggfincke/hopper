@@ -31,6 +31,7 @@ import static org.mockito.Mockito.*;
 // Tests product lifecycle operations including inventory management and referential integrity
 // Enables Mockito framework for dependency injection testing
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("null")
 class ProductServiceImplUnitTest
 {
     // * Test Dependencies

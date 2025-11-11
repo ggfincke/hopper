@@ -36,6 +36,7 @@ import static org.mockito.Mockito.*;
 // Tests the core listing management operations including creation, updates, and referential integrity
 // Enables Mockito framework for dependency injection testing
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("null")
 class ListingServiceImplUnitTest
 {
     // * Test Dependencies

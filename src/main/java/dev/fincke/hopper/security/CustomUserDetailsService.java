@@ -14,6 +14,7 @@ import java.util.UUID;
 
 // Custom UserDetailsService implementation for loading users from database
 @Service
+@SuppressWarnings("null")
 public class CustomUserDetailsService implements UserDetailsService
 {
     // * Attributes
