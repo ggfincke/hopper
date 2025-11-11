@@ -1,0 +1,22 @@
+# Build output
+dist
+build
+
+# Dependencies
+node_modules
+
+# Test coverage
+coverage
+
+# Minified files
+*.min.js
+*.min.css
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files
+.env.local
+.env.*.local
