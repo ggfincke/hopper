@@ -70,6 +70,46 @@ export JWT_SECRET=your_jwt_secret_key_minimum_256_bits
 export CREDENTIAL_MASTER_KEY=your_32_plus_character_encryption_key
 ```
 
+## Docker Dev Stack
+
+Spin up the API, Postgres, Go marketplace stub, and an optional frontend dev server with a consistent `docker compose` workflow.
+
+### Prerequisites
+
+- Docker Desktop (or equivalent) with Compose v2
+- GNU Make
+
+### Quick Start
+
+1. Copy the sample env files: `cp env/.sample/*.env env/`
+2. Start everything: `make dev-up`
+3. Follow logs: `make dev-logs` (or `make dev-logs SERVICE=api`)
+4. Stop containers: `make dev-down` (use `make dev-clean` to also drop volumes)
+
+The Makefile also provides `api-shell`, `marketplace-shell`, `api-image`, `marketplace-image`, and `compose-config` helpers.
+
+### Services & Ports
+
+| Service | Description | Host Port | Notes |
+| --- | --- | --- | --- |
+| `api` | Spring Boot app (`Dockerfile.api`) | 8080 | Talks to Postgres at `jdbc:postgresql://db:5432/hopper` |
+| `db` | PostgreSQL 15 + Flyway bootstrap | 5432 | Data stored in the `pgdata` volume |
+| `marketplace` | Go marketplace stub | 8090 | Health endpoint at `/v1/health` |
+| `frontend` | Vite dev server placeholder | 5173 | Opt-in profile `--profile frontend` |
+| `seed` | Flyway CLI for manual migrations | n/a | Run as needed: `docker compose --profile seed run --rm seed` |
+
+### Environment Files
+
+- Samples live in `env/.sample/*.env`; working copies belong in `env/*.env` (gitignored).
+- `env/api.env` holds API secrets and DB credentials, `env/db.env` configures the Postgres container, `env/marketplace.env` covers the Go stub, and `env/frontend.env` stores future Vite vars.
+- Use `scripts/wait-for-db.sh db 5432` if you need to gate other tooling until Postgres is healthy.
+
+### Overrides & Profiles
+
+- Drop a local `docker-compose.override.yml` when you need to remap ports or add bind mounts; Compose will auto-merge it.
+- Optional services (`frontend`, `seed`) are protected by profiles so they only run when explicitly requested: `docker compose --profile frontend up`.
+- Database state lives in the `pgdata` named volume; reset it with `make dev-clean` when you need a blank slate.
+
 ## Development
 
 ```bash

@@ -1,0 +1,3 @@
+# Ignore developer-specific env files while keeping samples tracked
+*.env
+!/.sample/*.env

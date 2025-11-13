@@ -5,7 +5,6 @@ import dev.fincke.hopper.order.buyer.BuyerRepository;
 import dev.fincke.hopper.order.buyer.exception.BuyerNotFoundException;
 import dev.fincke.hopper.order.item.OrderItem;
 import dev.fincke.hopper.order.item.OrderItemRepository;
-import dev.fincke.hopper.order.order.Order;
 import dev.fincke.hopper.order.order.dto.OrderCreateRequest;
 import dev.fincke.hopper.order.order.dto.OrderResponse;
 import dev.fincke.hopper.order.order.dto.OrderUpdateRequest;

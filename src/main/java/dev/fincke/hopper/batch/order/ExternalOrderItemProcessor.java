@@ -3,6 +3,7 @@ package dev.fincke.hopper.batch.order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 // Normalizes marketplace records into the command shape consumed by the domain importer.
@@ -13,7 +14,7 @@ public class ExternalOrderItemProcessor implements ItemProcessor<ExternalOrderRe
     private static final Logger logger = LoggerFactory.getLogger(ExternalOrderItemProcessor.class);
 
     @Override
-    public OrderImportRequest process(ExternalOrderRecord item)
+    public OrderImportRequest process(@NonNull ExternalOrderRecord item)
     {
         if (item == null)
         {

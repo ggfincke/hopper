@@ -69,8 +69,7 @@ public class SecurityConfig
     @Bean
     public DaoAuthenticationProvider authenticationProvider()
     {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
@@ -188,7 +187,7 @@ public class SecurityConfig
         
         // Allow H2 console in development (disable frame options)
         http.headers(headers -> headers
-            .frameOptions().sameOrigin()  // Allow H2 console frames
+            .frameOptions(frame -> frame.sameOrigin())  // Allow H2 console frames
         );
         
         return http.build();
