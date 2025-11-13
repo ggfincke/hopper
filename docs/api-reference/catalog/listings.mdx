@@ -1,0 +1,65 @@
+---
+title: "Listings"
+description: "Marketplace-specific offers that tie products to platforms"
+---
+
+Listings map a product to a platform with pricing, status, and quantity metadata. They are central to order import/export workflows.
+
+## Data shapes
+
+```json
+// ListingCreateRequest
+{
+  "productId": "8d5f2657-1b42-431c-9d7c-70579015bb32",
+  "platformId": "c2a393da-5ef5-4c35-9b65-22a932224b7f",
+  "externalListingId": "EBAY-44829991",
+  "status": "ACTIVE",
+  "price": "94.99",
+  "quantityListed": 10
+}
+
+// ListingResponse
+{
+  "id": "5d02e65f-54cb-404d-a673-7d5bc092a4b5",
+  "productId": "8d5f2657-1b42-431c-9d7c-70579015bb32",
+  "platformId": "c2a393da-5ef5-4c35-9b65-22a932224b7f",
+  "externalListingId": "EBAY-44829991",
+  "status": "ACTIVE",
+  "price": "94.99",
+  "quantityListed": 10
+}
+```
+
+## Endpoints
+
+| Method & Path | Description |
+|---------------|-------------|
+| `POST /api/listings` | Create a listing (`201`). |
+| `PUT /api/listings/{id}` | Update via `ListingUpdateRequest`. |
+| `GET /api/listings/{id}` | Retrieve by UUID. |
+| `GET /api/listings` | Pageable list (defaults to `size=20`). |
+| `DELETE /api/listings/{id}` | Delete (`204`). |
+
+### Status helpers
+
+- `PUT /api/listings/{id}/status?status=INACTIVE`
+- `POST /api/listings/{id}/activate`
+- `POST /api/listings/{id}/deactivate`
+
+Each returns the updated `ListingResponse`.
+
+### Query filters
+
+| Pattern | Description |
+|---------|-------------|
+| `GET /api/listings?productId={uuid}` | Listings for a product (pageable). |
+| `GET /api/listings?platformId={uuid}` | Listings on a platform (pageable). |
+| `GET /api/listings?status={value}` | Filter by status (pageable). |
+| `GET /api/listings?platformId={uuid}&externalListingId={id}` | Exact lookup combining platform + external ID. |
+
+### Price & quantity adjustments
+
+- `PUT /api/listings/{id}/price?price=99.99`
+- `PUT /api/listings/{id}/quantity?quantityListed=5`
+
+Both return `ListingResponse` and validate non-negative values.

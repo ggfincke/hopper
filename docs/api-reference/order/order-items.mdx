@@ -1,0 +1,43 @@
+---
+title: "Order Items"
+description: "Line items that connect orders to listings"
+---
+
+Each order item references the parent order and a listing, carries the purchased quantity, the unit price captured at checkout, and exposes convenience totals.
+
+## Data shapes
+
+```json
+// OrderItemCreateRequest
+{
+  "orderId": "9c14a5c3-182e-4781-8ad3-65a2f77f5f71",
+  "listingId": "5d02e65f-54cb-404d-a673-7d5bc092a4b5",
+  "quantity": 2,
+  "price": "54.99"
+}
+
+// OrderItemResponse
+{
+  "id": "1f2a5526-8a52-4c29-8e4f-0baac144e619",
+  "orderId": "9c14a5c3-182e-4781-8ad3-65a2f77f5f71",
+  "listingId": "5d02e65f-54cb-404d-a673-7d5bc092a4b5",
+  "externalListingId": "EBAY-44829991",
+  "quantity": 2,
+  "price": "54.99",
+  "lineTotal": "109.98"
+}
+```
+
+## Endpoints
+
+| Method & Path | Description |
+|---------------|-------------|
+| `GET /api/order-items` | List all order items. |
+| `GET /api/order-items/{id}` | Fetch a single item. |
+| `GET /api/order-items/order/{orderId}` | Items belonging to an order. |
+| `POST /api/order-items` | Create an item (`201`). |
+| `PUT /api/order-items/{id}` | Update quantity and/or price. |
+| `DELETE /api/order-items/{id}` | Delete (`204`). |
+| `GET /api/order-items/{id}/line-total` | Recalculate the line total as a decimal. |
+
+All endpoints accept UUID strings; controllers guard against malformed IDs and will return `400` for invalid UUID formats or `404` when the entity is missing.

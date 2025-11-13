@@ -1,0 +1,126 @@
+---
+title: "Authentication"
+description: "JWT login, refresh, logout, session inspection, and token validation"
+---
+
+All authentication routes live under `/api/auth`. Successful login returns both short-lived access tokens and long-lived refresh tokens. Every downstream request (outside `/healthz` and these auth routes) must present the access token in the `Authorization` header.
+
+## POST /api/auth/login
+
+Authenticate a user with a username or email + password combo. Optionally set `rememberMe` to extend the access token lifetime.
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+        "usernameOrEmail": "admin@hopper.dev",
+        "password": "p@55word!",
+        "rememberMe": true
+      }'
+```
+
+### Request body
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `usernameOrEmail` | string | ✅ | Username remains case-sensitive; emails are normalized to lowercase |
+| `password` | string | ✅ | Minimum 1 character (8+ recommended) |
+| `rememberMe` | boolean | | Extends access token expiration to `JwtProperties#rememberMeExpirationMs` |
+
+### Success response `200 OK`
+
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
+  "tokenType": "Bearer",
+  "expiresIn": 604800,
+  "refreshExpiresIn": 2592000,
+  "user": {
+    "id": "f2cfb607-326d-4c8c-96d5-f79206f42f18",
+    "username": "admin",
+    "email": "admin@hopper.dev",
+    "roles": ["ADMIN"],
+    "enabled": true,
+    "accountLocked": false,
+    "lastLogin": "2024-05-06T14:11:22.456782"
+  }
+}
+```
+
+On success the refresh token is also stored in a secure HTTP-only cookie (path `/`, SameSite `Strict`). `401` indicates bad credentials, `500` signals internal errors.
+
+## POST /api/auth/refresh
+
+Exchanges a valid refresh token for fresh tokens. The refresh token can be supplied in the JSON body or picked up from the cookie issued at login.
+
+```json
+POST /api/auth/refresh
+{
+  "refreshToken": "eyJhbGciOiJI..."
+}
+```
+
+- Returns the same `AuthResponse` shape as login.
+- Responds with `401` if the token is missing, malformed, expired, or belongs to a deleted/disabled user.
+
+## POST /api/auth/logout
+
+Clears the refresh-token cookie and `SecurityContext`. Clients should discard cached access tokens.
+
+```json
+{
+  "message": "Logged out successfully",
+  "timestamp": "2024-05-06T14:22:00.03123"
+}
+```
+
+## GET /api/auth/me
+
+Returns the `UserResponse` for the caller inferred from the current security context.
+
+- Headers: `Authorization: Bearer <access-token>`
+- `401` if the request is anonymous or the token is invalid.
+
+```json
+{
+  "id": "f2cfb607-326d-4c8c-96d5-f79206f42f18",
+  "username": "admin",
+  "email": "admin@hopper.dev",
+  "enabled": true,
+  "accountLocked": false,
+  "failedLoginAttempts": 0,
+  "roles": ["ADMIN"],
+  "createdAt": "2024-03-01T10:15:00",
+  "updatedAt": "2024-04-10T08:44:12"
+}
+```
+
+## POST /api/auth/validate
+
+Validates an access token and returns structured metadata (remaining TTL, resolved user, account flags).
+
+| Header | Description |
+|--------|-------------|
+| `Authorization` | Required. Standard Bearer token header. |
+
+### Possible responses
+
+- `valid: true` with `expiresAt`, `remainingTimeSeconds`, and embedded `user` info
+- `valid: false` with `errorCode` of `TOKEN_MISSING`, `TOKEN_MALFORMED`, `TOKEN_EXPIRED`, `ACCOUNT_DISABLED`, `ACCOUNT_LOCKED`, or `USER_NOT_FOUND`
+
+```json
+{
+  "valid": true,
+  "expiresAt": "2024-05-07T14:33:45",
+  "remainingTimeSeconds": 86399,
+  "user": {
+    "id": "f2cfb607-326d-4c8c-96d5-f79206f42f18",
+    "username": "admin",
+    "email": "admin@hopper.dev",
+    "roles": ["ADMIN"],
+    "enabled": true,
+    "accountLocked": false
+  }
+}
+```

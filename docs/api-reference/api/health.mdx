@@ -1,0 +1,32 @@
+---
+title: "Health"
+description: "Anonymous readiness probe exposed by the Spring Boot layer"
+---
+
+## GET /healthz
+
+Returns build metadata so uptime monitors and load balancers can assess service health without authentication.
+
+| Requirement | Value |
+|-------------|-------|
+| Auth | Not required |
+| Headers | `Accept: application/json` |
+| Response type | `200 OK` with `Health` object |
+
+```http
+GET /healthz HTTP/1.1
+Host: localhost:8080
+Accept: application/json
+```
+
+```json
+{
+  "status": "ok",
+  "service": "hopper",
+  "version": "0.1.0-SNAPSHOT"
+}
+```
+
+- `status` hardcodes to `"ok"` when the controller executes.
+- `service` is always `"hopper"`.
+- `version` is read from `BuildProperties` (the Gradle build info).

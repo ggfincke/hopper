@@ -1,0 +1,95 @@
+---
+title: "Users"
+description: "User CRUD plus password, role, account-state, and lookup endpoints"
+---
+
+All `/api/users/**` routes require an authenticated caller with the appropriate role (typically `ADMIN`). Each endpoint exchanges `UserResponse` records unless noted otherwise.
+
+## Data shapes
+
+### UserCreateRequest
+
+```json
+{
+  "username": "casey",
+  "email": "casey@example.com",
+  "password": "superSecret123!",
+  "roles": ["USER", "API_CLIENT"],
+  "enabled": true
+}
+```
+
+- `username`: 3-50 chars, trimmed.
+- `email`: normalized to lowercase.
+- `password`: min 8 chars; hashing occurs server-side.
+- `roles`: defaults to `["USER"]` when omitted.
+- `enabled`: defaults to `true`.
+
+### UserResponse
+
+```json
+{
+  "id": "dff5c57c-cc49-4b7b-9ef8-2ce7d6c2ce0d",
+  "username": "casey",
+  "email": "casey@example.com",
+  "enabled": true,
+  "accountLocked": false,
+  "failedLoginAttempts": 0,
+  "roles": ["USER", "API_CLIENT"],
+  "createdAt": "2024-04-01T12:11:02",
+  "updatedAt": "2024-04-10T14:44:55"
+}
+```
+
+## Core CRUD
+
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/users` | Creates a user and returns `201 Created` with `UserResponse`. |
+| `PUT /api/users/{id}` | Updates mutable fields using `UserUpdateRequest`. |
+| `GET /api/users/{id}` | Fetches a single user. |
+| `GET /api/users` | Returns all users. |
+| `DELETE /api/users/{id}` | Permanently deletes the user (`204 No Content`). |
+
+`UserUpdateRequest` accepts any combination of `username`, `email`, `roles`, `enabled`, or `accountLocked`. Fields are trimmed when present.
+
+## Password management
+
+| Endpoint | Payload | Notes |
+|----------|---------|-------|
+| `PUT /api/users/{id}/password` | `PasswordChangeRequest` (`currentPassword`, `newPassword`) | Validates the current password before persisting the new hash. |
+| `PUT /api/users/{id}/password/reset?newPassword=...` | Query param | Admin-only hard reset that bypasses current password validation. |
+| `POST /api/users/{id}/password/verify?password=...` | Query param | Returns `true` / `false` depending on whether the supplied password matches the stored hash. |
+
+## Account state
+
+- `PUT /api/users/{id}/lock` / `PUT /api/users/{id}/unlock`
+- `PUT /api/users/{id}/enable` / `PUT /api/users/{id}/disable`
+
+Each endpoint returns `200 OK` with an empty body.
+
+## Role assignments
+
+- `PUT /api/users/{id}/roles/{roleType}` → adds a role (idempotent).
+- `DELETE /api/users/{id}/roles/{roleType}` → removes a role.
+- `GET /api/users/roles/{roleType}` → returns a list of `UserResponse` that currently hold the role. `roleType` accepts `ADMIN`, `USER`, or `API_CLIENT` (case-insensitive).
+
+## Lookup & search
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/users/username/{username}` | Fetch by username |
+| `GET /api/users/email/{email}` | Fetch by email |
+| `GET /api/users/identifier/{identifier}` | Fetch by username or email |
+| `GET /api/users/search/username/{username}` | Fuzzy match on username |
+| `GET /api/users/search/email/{email}` | Fuzzy match on email |
+| `GET /api/users/enabled` | All enabled users |
+| `GET /api/users/locked` | All locked users |
+
+All responses are lists of `UserResponse`.
+
+## Existence & validation helpers
+
+- `GET /api/users/exists/username/{username}` → returns `true` if the username exists.
+- `GET /api/users/exists/email/{email}` → returns `true` if the email exists.
+- `POST /api/users/{id}/validate` → runs the domain validations for a user and returns `200 OK` (empty body) when successful.
