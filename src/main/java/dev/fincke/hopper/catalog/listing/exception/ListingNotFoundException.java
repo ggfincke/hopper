@@ -1,9 +1,11 @@
 package dev.fincke.hopper.catalog.listing.exception;
 
+import dev.fincke.hopper.api.error.NotFoundException;
+
 import java.util.UUID;
 
 // Exception thrown when a requested listing cannot be found
-public class ListingNotFoundException extends RuntimeException 
+public class ListingNotFoundException extends NotFoundException 
 {
     // * Attributes
     

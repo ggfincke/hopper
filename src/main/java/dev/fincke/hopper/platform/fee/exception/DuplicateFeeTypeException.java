@@ -1,9 +1,11 @@
 package dev.fincke.hopper.platform.fee.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 import java.util.UUID;
 
 // Exception thrown when attempting to create duplicate fee type for an order
-public class DuplicateFeeTypeException extends RuntimeException
+public class DuplicateFeeTypeException extends ConflictException
 {
     // * Constructors
     

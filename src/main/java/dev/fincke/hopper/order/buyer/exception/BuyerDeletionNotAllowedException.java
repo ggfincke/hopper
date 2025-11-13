@@ -1,9 +1,11 @@
 package dev.fincke.hopper.order.buyer.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 import java.util.UUID;
 
 // Raised when a buyer cannot be removed because orders are still associated with the buyer
-public class BuyerDeletionNotAllowedException extends RuntimeException
+public class BuyerDeletionNotAllowedException extends ConflictException
 {
     // ID of the buyer that cannot be deleted
     private final UUID buyerId;

@@ -1,9 +1,11 @@
 package dev.fincke.hopper.order.order.exception;
 
+import dev.fincke.hopper.api.error.BadRequestException;
+
 import java.util.UUID;
 
 // Domain exception for invalid order status transitions (business rule violation)
-public class InvalidOrderStatusException extends RuntimeException
+public class InvalidOrderStatusException extends BadRequestException
 {
     
     // Context information for debugging and error handling

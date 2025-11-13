@@ -17,6 +17,7 @@ func writeError(w http.ResponseWriter, status int, code, message string, opts ..
 		opt(&apiErr)
 	}
 
+	markIntegrationStub(w)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(errorEnvelope{Error: apiErr})

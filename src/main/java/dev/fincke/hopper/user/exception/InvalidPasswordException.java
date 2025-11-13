@@ -1,7 +1,9 @@
 package dev.fincke.hopper.user.exception;
 
+import dev.fincke.hopper.api.error.BadRequestException;
+
 // Domain exception for password validation failures
-public class InvalidPasswordException extends RuntimeException
+public class InvalidPasswordException extends BadRequestException
 {
     
     // Validation error details

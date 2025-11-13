@@ -31,6 +31,7 @@ func main() {
 
 	addr := ":" + port
 	log.Printf("starting %s on %s", serviceName, addr)
+	log.Printf("%s: eBay/TCGPlayer integration is stubbed/unfinished; live marketplace calls are disabled", serviceName)
 
 	if err := http.ListenAndServe(addr, mux); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("server stopped: %v", err)

@@ -20,6 +20,7 @@ import java.util.List;
 
 // * Remote Implementation
 // Bridges Java orchestration and the Go connector over REST/JSON.
+// NOTE: The Go connector currently returns stubbed placeholders for eBay/TCGPlayer until live APIs are integrated.
 public class RemoteGoMarketplaceClient implements MarketplaceClient
 {
     private final RestClient restClient;

@@ -1,9 +1,11 @@
 package dev.fincke.hopper.order.order.exception;
 
+import dev.fincke.hopper.api.error.NotFoundException;
+
 import java.util.UUID;
 
 // Domain exception for order lookup failures (carries search criteria for debugging)
-public class OrderNotFoundException extends RuntimeException
+public class OrderNotFoundException extends NotFoundException
 {
     
     // Search criteria that failed (for debugging context)

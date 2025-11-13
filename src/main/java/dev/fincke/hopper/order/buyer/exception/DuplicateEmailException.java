@@ -1,7 +1,9 @@
 package dev.fincke.hopper.order.buyer.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 // Business rule exception for duplicate email addresses (carries email for context)
-public class DuplicateEmailException extends RuntimeException
+public class DuplicateEmailException extends ConflictException
 {
     
     // The duplicate email that caused the conflict

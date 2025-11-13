@@ -1,9 +1,11 @@
 package dev.fincke.hopper.user.exception;
 
+import dev.fincke.hopper.api.error.NotFoundException;
+
 import java.util.UUID;
 
 // Domain exception for user lookup failures (carries search criteria for debugging)
-public class UserNotFoundException extends RuntimeException
+public class UserNotFoundException extends NotFoundException
 {
     
     // Search criteria that failed (for debugging context)

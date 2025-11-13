@@ -1,9 +1,11 @@
 package dev.fincke.hopper.platform.credential.exception;
 
+import dev.fincke.hopper.api.error.NotFoundException;
+
 import java.util.UUID;
 
 // Exception thrown when a requested platform credential cannot be found
-public class PlatformCredentialNotFoundException extends RuntimeException 
+public class PlatformCredentialNotFoundException extends NotFoundException 
 {
     // * Attributes
     

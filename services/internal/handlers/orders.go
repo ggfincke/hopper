@@ -14,6 +14,7 @@ func CreateOrder(store OrderStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
+		// TODO: Swap the stub store for real marketplace adapters when eBay/TCG APIs are available.
 		key := strings.TrimSpace(r.Header.Get(idempotencyHeader))
 		if key == "" {
 			writeError(w, http.StatusBadRequest, "INVALID_REQUEST", "Idempotency-Key header is required")
@@ -43,6 +44,7 @@ func CreateOrder(store OrderStore) http.HandlerFunc {
 			if deduped {
 				status = http.StatusOK
 			}
+			markIntegrationStub(w)
 			w.Header().Set("Content-Type", "application/json")
 			w.Header().Set(idempotencyHeader, key)
 			w.WriteHeader(status)
@@ -71,6 +73,7 @@ func GetOrder(store OrderStore) http.HandlerFunc {
 			return
 		}
 
+		markIntegrationStub(w)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_ = json.NewEncoder(w).Encode(resp)

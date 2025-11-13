@@ -15,6 +15,8 @@ import dev.fincke.hopper.marketplace.service.dto.BuyerDetails;
 import dev.fincke.hopper.marketplace.service.dto.ListingPublicationRequest;
 import dev.fincke.hopper.marketplace.service.dto.OrderSubmissionItem;
 import dev.fincke.hopper.marketplace.service.dto.OrderSubmissionRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +26,8 @@ import java.util.List;
 @Service
 public class DefaultMarketplaceConnectorService implements MarketplaceConnectorService
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMarketplaceConnectorService.class);
+
     // * Dependencies
     // Underlying connector client (stub or remote) selected via configuration.
     private final MarketplaceClient marketplaceClient;
@@ -33,6 +37,7 @@ public class DefaultMarketplaceConnectorService implements MarketplaceConnectorS
     public DefaultMarketplaceConnectorService(MarketplaceClient marketplaceClient)
     {
         this.marketplaceClient = marketplaceClient;
+        LOGGER.warn("Marketplace connector service is running in stub mode; eBay/TCGPlayer integrations are unfinished.");
     }
 
     @Override

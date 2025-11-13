@@ -3,6 +3,8 @@ package dev.fincke.hopper.marketplace.client.config;
 import dev.fincke.hopper.marketplace.client.MarketplaceClient;
 import dev.fincke.hopper.marketplace.client.adapter.RemoteGoMarketplaceClient;
 import dev.fincke.hopper.marketplace.client.adapter.StubMarketplaceClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +19,8 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 @EnableConfigurationProperties(MarketplaceClientProperties.class)
 public class MarketplaceClientConfiguration
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MarketplaceClientConfiguration.class);
+
     @Bean
     // Chooses stub or remote implementation depending on `marketplace.client.mode`.
     public MarketplaceClient marketplaceClient(
@@ -24,7 +28,9 @@ public class MarketplaceClientConfiguration
         StubMarketplaceClient stub,
         RemoteGoMarketplaceClient remote)
     {
-        return properties.getMode() == MarketplaceClientMode.REMOTE ? remote : stub;
+        MarketplaceClient client = properties.getMode() == MarketplaceClientMode.REMOTE ? remote : stub;
+        LOGGER.warn("Marketplace integrations for eBay/TCGPlayer are stubbed/unfinished (mode: {}). Live API calls are disabled.", properties.getMode());
+        return client;
     }
 
     @Bean

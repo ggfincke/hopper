@@ -1,9 +1,11 @@
 package dev.fincke.hopper.order.buyer.exception;
 
+import dev.fincke.hopper.api.error.NotFoundException;
+
 import java.util.UUID;
 
 // Domain exception for buyer lookup failures (carries search criteria for debugging)
-public class BuyerNotFoundException extends RuntimeException
+public class BuyerNotFoundException extends NotFoundException
 {
     
     // Search criteria that failed (for debugging context)

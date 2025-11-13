@@ -16,6 +16,7 @@ func CreateListing(store ListingStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
+		// TODO: Replace stubbed store wiring with live eBay/TCG connectors once upstream APIs are ready.
 		key := strings.TrimSpace(r.Header.Get(idempotencyHeader))
 		if key == "" {
 			writeError(w, http.StatusBadRequest, "INVALID_REQUEST", "Idempotency-Key header is required")
@@ -40,6 +41,7 @@ func CreateListing(store ListingStore) http.HandlerFunc {
 			if deduped {
 				status = http.StatusOK
 			}
+			markIntegrationStub(w)
 			w.Header().Set("Content-Type", "application/json")
 			w.Header().Set(idempotencyHeader, key)
 			w.WriteHeader(status)
@@ -66,6 +68,7 @@ func GetListing(store ListingStore) http.HandlerFunc {
 			return
 		}
 
+		markIntegrationStub(w)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_ = json.NewEncoder(w).Encode(resp)
@@ -129,6 +132,7 @@ func validatePrice(pricePayload apitypes.PricePayload, platform string) error {
 	}
 
 	if strings.EqualFold(platform, "ebay") {
+		// Placeholder guard rail for eventual eBay contract; enforces demo constraint until live linking lands.
 		if amount < 0.99 {
 			return errors.New("price.amount must be at least 0.99 for eBay listings")
 		}

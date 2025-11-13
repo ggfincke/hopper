@@ -1,10 +1,12 @@
 package dev.fincke.hopper.catalog.product.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 import java.util.UUID;
 
 // Thrown when a stock update would drop inventory below zero or exceed available reserves.
 // Safeguards against overselling by surfacing the shortage to callers.
-public class InsufficientStockException extends RuntimeException 
+public class InsufficientStockException extends ConflictException 
 {
     // * Attributes
     

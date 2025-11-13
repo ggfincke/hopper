@@ -1,9 +1,11 @@
 package dev.fincke.hopper.order.order.exception;
 
+import dev.fincke.hopper.api.error.ConflictException;
+
 import java.util.UUID;
 
 // Domain exception for duplicate external order ID violations (business rule enforcement)
-public class DuplicateExternalOrderException extends RuntimeException
+public class DuplicateExternalOrderException extends ConflictException
 {
     
     // Context information for the duplicate violation
