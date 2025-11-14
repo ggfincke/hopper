@@ -1,12 +1,22 @@
+import { useTheme } from '../../hooks/useTheme'
+import { cn } from '../../lib/utils'
+
 type NavItemProps = {
   icon: string
   label: string
   active?: boolean
-  isDark: boolean
 }
 
-export function NavItem({ icon, label, active, isDark }: NavItemProps) {
-  const buttonClasses = [
+/**
+ * NavItem represents a single navigation link in the sidebar.
+ * Highlights active state with indigo background and shadow.
+ *
+ * @param active - Whether this nav item is currently active
+ */
+export function NavItem({ icon, label, active }: NavItemProps) {
+  const { isDark } = useTheme()
+
+  const buttonClasses = cn(
     'flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors',
     active
       ? isDark
@@ -15,21 +25,21 @@ export function NavItem({ icon, label, active, isDark }: NavItemProps) {
       : isDark
         ? 'text-slate-300 hover:bg-white/5'
         : 'text-slate-700 hover:bg-slate-100',
-    active ? 'font-semibold' : 'font-medium',
-  ]
+    active ? 'font-semibold' : 'font-medium'
+  )
 
-  const iconClasses = [
+  const iconClasses = cn(
     'flex h-7 w-7 items-center justify-center rounded-full text-[15px]',
     active
       ? 'bg-white/15 text-white'
       : isDark
         ? 'bg-white/10 text-slate-300'
-        : 'bg-slate-200 text-slate-700',
-  ]
+        : 'bg-slate-200 text-slate-700'
+  )
 
   return (
-    <button className={buttonClasses.join(' ')}>
-      <span className={iconClasses.join(' ')}>{icon}</span>
+    <button className={buttonClasses}>
+      <span className={iconClasses}>{icon}</span>
       <span>{label}</span>
     </button>
   )

@@ -1,39 +1,48 @@
+import { useTheme } from '../../hooks/useTheme'
+import { cn } from '../../lib/utils'
 import type { SalesPoint } from '../../lib/dashboardData'
 
 type SalesChartCardProps = {
-  isDark: boolean
   data: SalesPoint[]
 }
 
-export function SalesChartCard({ isDark, data }: SalesChartCardProps) {
-  const containerClasses = [
+/**
+ * SalesChartCard displays sales performance over time with a bar chart.
+ * Shows revenue and orders side-by-side for trend comparison.
+ *
+ * @param data - Array of sales data points by month
+ */
+export function SalesChartCard({ data }: SalesChartCardProps) {
+  const { isDark } = useTheme()
+
+  const containerClasses = cn(
     'flex flex-col gap-3 rounded-2xl border p-4 shadow-[0_16px_40px_rgba(15,23,42,0.35)]',
     isDark
       ? 'bg-slate-950/70 border-slate-900/80 text-slate-100'
-      : 'bg-white border-slate-200 text-slate-900',
-  ]
+      : 'bg-white border-slate-200 text-slate-900'
+  )
 
-  const chartSurfaceClasses = [
+  const chartSurfaceClasses = cn(
     'mt-2 flex min-h-[190px] flex-col justify-between rounded-2xl p-4',
     isDark
       ? 'bg-[radial-gradient(circle_at_top,_#020617,_#0b1120,_#020617)]'
-      : 'bg-[radial-gradient(circle_at_top,_#eef2ff,_#e0f2fe,_#f9fafb)]',
-  ]
+      : 'bg-[radial-gradient(circle_at_top,_#eef2ff,_#e0f2fe,_#f9fafb)]'
+  )
 
   const descriptionClass = isDark ? 'text-slate-400' : 'text-slate-500'
   const legendTextClass = isDark ? 'text-slate-200' : 'text-slate-700'
   const monthTextClass = isDark ? 'text-slate-400' : 'text-slate-500'
 
   return (
-    <div className={containerClasses.join(' ')}>
+    <div className={containerClasses}>
       <div className="flex items-center justify-between gap-3 text-sm">
         <div>
           <div className="text-sm font-semibold">Sales Overtime</div>
-          <div className={`mt-1 text-[11px] ${descriptionClass}`}>
+          <div className={cn('mt-1 text-[11px]', descriptionClass)}>
             Revenue vs. orders across all marketplaces.
           </div>
         </div>
-        <div className={`flex items-center gap-3 text-[11px] ${legendTextClass}`}>
+        <div className={cn('flex items-center gap-3 text-[11px]', legendTextClass)}>
           <span className="inline-flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-indigo-500" />
             Revenue
@@ -45,7 +54,7 @@ export function SalesChartCard({ isDark, data }: SalesChartCardProps) {
         </div>
       </div>
 
-      <div className={chartSurfaceClasses.join(' ')}>
+      <div className={chartSurfaceClasses}>
         <div className="flex flex-1 items-end gap-2">
           {data.map(({ month, revenue, orders }) => (
             <div key={month} className="flex flex-1 items-end gap-1">
@@ -60,7 +69,7 @@ export function SalesChartCard({ isDark, data }: SalesChartCardProps) {
             </div>
           ))}
         </div>
-        <div className={`mt-2 flex justify-between text-[11px] ${monthTextClass}`}>
+        <div className={cn('mt-2 flex justify-between text-[11px]', monthTextClass)}>
           {data.map(({ month }) => (
             <span key={month}>{month}</span>
           ))}
