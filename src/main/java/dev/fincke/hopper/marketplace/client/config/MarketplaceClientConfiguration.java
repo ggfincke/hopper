@@ -17,6 +17,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 @Configuration
 // Enables binding of marketplace.client.* properties into MarketplaceClientProperties.
 @EnableConfigurationProperties(MarketplaceClientProperties.class)
+@SuppressWarnings("null")
 public class MarketplaceClientConfiguration
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MarketplaceClientConfiguration.class);

@@ -33,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // Tests REST API endpoints using Spring MockMvc for HTTP request/response validation
 // Enables Mockito framework for dependency injection testing
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("null")
 class OrderControllerTest
 {
     // * Test Infrastructure

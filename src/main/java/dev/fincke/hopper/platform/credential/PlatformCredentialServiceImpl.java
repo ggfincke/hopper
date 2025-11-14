@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 // Implements platform credential workflows, including encryption-aware helpers
 @Service
 @Transactional(readOnly = true) // default to read-only transactions for better performance
+@SuppressWarnings("null")
 public class PlatformCredentialServiceImpl implements PlatformCredentialService 
 {
     // * Dependencies

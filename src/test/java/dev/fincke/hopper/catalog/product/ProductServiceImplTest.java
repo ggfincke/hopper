@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 // * Test Class
 // Integration tests for ProductServiceImpl deletion constraints with @DataJpaTest
 @DataJpaTest
+@SuppressWarnings("null")
 class ProductServiceImplTest
 {
     // * Dependencies

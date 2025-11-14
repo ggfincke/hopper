@@ -19,6 +19,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @EnableBatchProcessing
 @EnableConfigurationProperties(OrderImportJobProperties.class)
+@SuppressWarnings("null")
 public class OrderImportJobConfig
 {
     @Bean
