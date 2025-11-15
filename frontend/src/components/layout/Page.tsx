@@ -1,15 +1,20 @@
+// src/components/layout/Page.tsx
+// Shared dashboard page primitives for consistent spacing & copy blocks
 import { type ReactNode } from 'react'
 import { cn } from '../../lib/utils'
 
+// standard layout container props
 type PageProps = {
   children: ReactNode
   className?: string
 }
 
+// * Page centers the content column & enforces max width
 export function Page({ children, className }: PageProps) {
   return <div className={cn('mx-auto flex w-full max-w-7xl flex-col gap-6', className)}>{children}</div>
 }
 
+// header block props for title/description/actions
 type PageHeaderProps = {
   title?: ReactNode
   description?: ReactNode
@@ -18,6 +23,7 @@ type PageHeaderProps = {
   className?: string
 }
 
+// * PageHeader aligns hero content & optional action cluster
 export function PageHeader({ title, description, actions, children, className }: PageHeaderProps) {
   return (
     <header className={cn('flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between', className)}>
@@ -41,15 +47,18 @@ export function PageHeader({ title, description, actions, children, className }:
   )
 }
 
+// page body props for grid/list children
 type PageContentProps = {
   children: ReactNode
   className?: string
 }
 
+// * PageContent stacks sections & accepts overrides
 export function PageContent({ children, className }: PageContentProps) {
   return <div className={cn('flex flex-col gap-6', className)}>{children}</div>
 }
 
+// section block props for groupings
 type PageSectionProps = {
   title?: ReactNode
   description?: ReactNode
@@ -57,6 +66,7 @@ type PageSectionProps = {
   className?: string
 }
 
+// * PageSection adds headings & subcopy for each grouping
 export function PageSection({ title, description, children, className }: PageSectionProps) {
   return (
     <section className={cn('space-y-3', className)}>
