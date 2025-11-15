@@ -1,6 +1,4 @@
 import { SearchBar } from './SearchBar'
-import { ThemeToggle } from './ThemeToggle'
-import { NotificationButton } from './NotificationButton'
 import { UserProfile } from './UserProfile'
 
 interface DashboardHeaderProps {
@@ -10,8 +8,8 @@ interface DashboardHeaderProps {
 }
 
 /**
- * DashboardHeader contains search bar, theme toggle, notifications, and user profile.
- * Composes multiple smaller components into a cohesive header layout.
+ * DashboardHeader contains search bar and user profile quick menu.
+ * Composes the top-level controls for the dashboard layout.
  *
  * @param userName - User's full name for profile display
  * @param userEmail - User's email for profile display
@@ -21,11 +19,7 @@ export function DashboardHeader({ userName, userEmail, userInitials }: Dashboard
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <SearchBar />
-      <div className="flex items-center gap-3">
-        <ThemeToggle />
-        <NotificationButton />
-        <UserProfile name={userName} email={userEmail} initials={userInitials} />
-      </div>
+      <UserProfile name={userName} email={userEmail} initials={userInitials} />
     </div>
   )
 }
