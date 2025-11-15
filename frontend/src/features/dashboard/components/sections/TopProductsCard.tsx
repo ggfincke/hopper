@@ -1,6 +1,6 @@
-import { useTheme } from '../../hooks/useTheme'
-import { cn } from '../../lib/utils'
-import type { ProductPerformance } from '../../lib/dashboardData'
+import { useTheme } from '../../../../hooks/useTheme'
+import { cn } from '../../../../lib/utils'
+import type { ProductPerformance } from '../../types'
 
 type TopProductsCardProps = {
   products: ProductPerformance[]

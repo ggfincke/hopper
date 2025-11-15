@@ -1,5 +1,5 @@
-import { MetricCard } from './MetricCard'
-import type { MetricSummary } from '../../lib/dashboardData'
+import type { MetricSummary } from '../../types'
+import { MetricCard } from '../leaf/MetricCard'
 
 interface MetricsGridProps {
   metrics: MetricSummary[]

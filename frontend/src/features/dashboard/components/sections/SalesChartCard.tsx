@@ -1,6 +1,6 @@
-import { useTheme } from '../../hooks/useTheme'
-import { cn } from '../../lib/utils'
-import type { SalesPoint } from '../../lib/dashboardData'
+import { useTheme } from '../../../../hooks/useTheme'
+import { cn } from '../../../../lib/utils'
+import type { SalesPoint } from '../../types'
 
 type SalesChartCardProps = {
   data: SalesPoint[]

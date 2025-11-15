@@ -1,7 +1,7 @@
 import { TrendingUp, TrendingDown } from 'lucide-react'
-import { useTheme } from '../../hooks/useTheme'
-import { cn } from '../../lib/utils'
-import type { MetricSummary } from '../../lib/dashboardData'
+import { useTheme } from '../../../../hooks/useTheme'
+import { cn } from '../../../../lib/utils'
+import type { MetricSummary } from '../../types'
 
 type MetricCardProps = MetricSummary & {
   className?: string

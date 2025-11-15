@@ -1,7 +1,7 @@
 import { Search, Mic } from 'lucide-react'
-import { useTheme } from '../../hooks/useTheme'
-import { Input } from '../ui/Input'
-import { cn } from '../../lib/utils'
+import { useTheme } from '../../../../hooks/useTheme'
+import { Input } from '../../../../components/ui/Input'
+import { cn } from '../../../../lib/utils'
 
 interface SearchBarProps {
   placeholder?: string

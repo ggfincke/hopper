@@ -1,5 +1,5 @@
-import { SearchBar } from './SearchBar'
-import { UserProfile } from './UserProfile'
+import { SearchBar } from '../leaf/SearchBar'
+import { UserProfile } from '../leaf/UserProfile'
 
 interface DashboardHeaderProps {
   userName: string

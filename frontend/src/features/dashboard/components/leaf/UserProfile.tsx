@@ -1,8 +1,8 @@
 import { type FocusEvent, useEffect, useRef, useState } from 'react'
 import { LogOut, Moon, Settings, Sparkles, Sun } from 'lucide-react'
-import { useTheme } from '../../hooks/useTheme'
-import { Avatar } from '../ui/Avatar'
-import { cn } from '../../lib/utils'
+import { useTheme } from '../../../../hooks/useTheme'
+import { Avatar } from '../../../../components/ui/Avatar'
+import { cn } from '../../../../lib/utils'
 
 const CLOSE_MENU_DELAY = 100
 

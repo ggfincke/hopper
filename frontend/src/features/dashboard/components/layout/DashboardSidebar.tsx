@@ -1,8 +1,8 @@
-import { useTheme } from '../../hooks/useTheme'
-import { Logo } from '../ui/Logo'
-import { NavItem } from './NavItem'
-import { cn } from '../../lib/utils'
-import type { NavItemData } from '../../lib/dashboardData'
+import { useTheme } from '../../../../hooks/useTheme'
+import { Logo } from '../../../../components/ui/Logo'
+import { cn } from '../../../../lib/utils'
+import type { NavItemData } from '../../types'
+import { NavItem } from '../leaf/NavItem'
 
 interface DashboardSidebarProps {
   navItems: NavItemData[]

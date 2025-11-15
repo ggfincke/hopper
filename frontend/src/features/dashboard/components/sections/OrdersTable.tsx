@@ -1,9 +1,9 @@
 import { MoreHorizontal } from 'lucide-react'
-import { useTheme } from '../../hooks/useTheme'
-import { cn } from '../../lib/utils'
-import { StatusBadge } from './StatusBadge'
-import { TableActionButtons } from './TableActionButtons'
-import type { RecentOrder } from '../../lib/dashboardData'
+import { useTheme } from '../../../../hooks/useTheme'
+import { cn } from '../../../../lib/utils'
+import type { RecentOrder } from '../../types'
+import { StatusBadge } from '../leaf/StatusBadge'
+import { TableActionButtons } from '../leaf/TableActionButtons'
 
 type OrdersTableProps = {
   orders: RecentOrder[]
