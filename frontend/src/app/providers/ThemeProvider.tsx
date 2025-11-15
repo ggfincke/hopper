@@ -1,3 +1,5 @@
+// src/app/providers/ThemeProvider.tsx
+// Manages global dark/light mode & exposes controls via context
 import { useState, type ReactNode } from 'react'
 import { ThemeContext } from './ThemeContext'
 
@@ -6,19 +8,13 @@ interface ThemeProviderProps {
   defaultTheme?: boolean
 }
 
-/**
- * ThemeProvider manages global theme state (light/dark mode) for the application.
- * Eliminates props drilling by making theme accessible via useTheme hook.
- *
- * @example
- * <ThemeProvider defaultTheme={true}>
- *   <App />
- * </ThemeProvider>
- */
+// * ThemeProvider wires children to ThemeContext value
 export function ThemeProvider({ children, defaultTheme = true }: ThemeProviderProps) {
   const [isDark, setIsDark] = useState(defaultTheme)
 
+  // flip theme flag
   const toggleTheme = () => setIsDark((prev) => !prev)
+  // force theme flag from callers
   const setTheme = (dark: boolean) => setIsDark(dark)
 
   return (

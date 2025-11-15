@@ -1,3 +1,5 @@
+// src/app/layout/AppLayout.tsx
+// Provides shell layout w/ themed background & sidebar slot
 import { type ReactNode } from 'react'
 import { useTheme } from '../../hooks/useTheme'
 import { cn } from '../../lib/utils'
@@ -7,16 +9,11 @@ interface AppLayoutProps {
   children: ReactNode
 }
 
-/**
- * AppLayout provides the main application layout structure.
- * Features a fixed sidebar and scrollable main content area with theme-aware background.
- *
- * @param sidebar - Sidebar component (typically DashboardSidebar)
- * @param children - Main content area components
- */
+// * Layout wrapper that pairs sidebar & scrollable content
 export function AppLayout({ sidebar, children }: AppLayoutProps) {
   const { isDark } = useTheme()
 
+  // adjust gradient palette based on theme
   const rootClasses = cn(
     'min-h-screen w-full font-sans',
     isDark
@@ -28,6 +25,7 @@ export function AppLayout({ sidebar, children }: AppLayoutProps) {
     <div className={rootClasses}>
       <div className="flex min-h-screen w-full overflow-hidden">
         {sidebar}
+        {/* main content column */}
         <main className="flex flex-1 flex-col gap-6 overflow-x-hidden px-4 py-6 lg:px-10">
           {children}
         </main>
