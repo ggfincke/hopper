@@ -1,5 +1,5 @@
-import { ThemeProvider } from './context/ThemeProvider'
-import { DashboardPage } from './pages/dashboard/DashboardPage'
+import { AppProviders } from './app/providers/AppProviders'
+import { DashboardPage } from './features/dashboard'
 
 /**
  * App root component.
@@ -7,8 +7,8 @@ import { DashboardPage } from './pages/dashboard/DashboardPage'
  */
 export default function App() {
   return (
-    <ThemeProvider defaultTheme={true}>
+    <AppProviders>
       <DashboardPage />
-    </ThemeProvider>
+    </AppProviders>
   )
 }
