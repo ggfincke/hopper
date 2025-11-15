@@ -1,3 +1,5 @@
+// src/features/dashboard/data/mockData.ts
+// Mock datasets used to populate dashboard UI & demos
 import type {
   MetricSummary,
   NavItemData,
@@ -6,6 +8,7 @@ import type {
   SalesPoint,
 } from '../types'
 
+// sidebar navigation presets
 export const NAV_ITEMS: NavItemData[] = [
   { icon: '▣', label: 'Overview', active: true },
   { icon: '⬚', label: 'Products' },
@@ -18,6 +21,7 @@ export const NAV_ITEMS: NavItemData[] = [
   { icon: '?', label: 'Help & Support' },
 ]
 
+// overview metric cards
 export const METRIC_SUMMARIES: MetricSummary[] = [
   {
     title: 'AVG. Order Value',
@@ -47,6 +51,7 @@ export const METRIC_SUMMARIES: MetricSummary[] = [
   },
 ]
 
+// monthly sales chart points
 export const SALES_PERFORMANCE: SalesPoint[] = [
   { month: 'Jun', revenue: 40, orders: 65 },
   { month: 'Jul', revenue: 55, orders: 45 },
@@ -57,6 +62,7 @@ export const SALES_PERFORMANCE: SalesPoint[] = [
   { month: 'Dec', revenue: 80, orders: 35 },
 ]
 
+// top selling products list
 export const TOP_PRODUCTS: ProductPerformance[] = [
   {
     name: 'Red Tape Sports Shoes',
@@ -81,6 +87,7 @@ export const TOP_PRODUCTS: ProductPerformance[] = [
   },
 ]
 
+// latest orders displayed in table
 export const RECENT_ORDERS: RecentOrder[] = [
   {
     id: '#2456JL',

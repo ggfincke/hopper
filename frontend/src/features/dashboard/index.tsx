@@ -1,3 +1,5 @@
+// src/features/dashboard/index.tsx
+// Entry point for customer dashboard experience & layout wiring
 import { AppLayout } from '../../app/layout/AppLayout'
 import { Page, PageContent, PageHeader, PageSection } from '../../components/layout/Page'
 import { DashboardHeader } from './components/layout/DashboardHeader'
@@ -15,15 +17,13 @@ import {
   TOP_PRODUCTS,
 } from './data/mockData'
 
-/**
- * DashboardPage orchestrates the main dashboard view.
- * Composes layout, sidebar, header, and content components.
- * All theme management handled by ThemeContext - no props drilling!
- */
+// * DashboardPage wires layout, sidebar & all content sections
 export function DashboardPage() {
+  // layout shell w/ sidebar nav
   return (
     <AppLayout sidebar={<DashboardSidebar navItems={NAV_ITEMS} />}>
       <Page>
+        {/* hero header row */}
         <PageHeader
           actions={
             <DashboardHeader
@@ -37,15 +37,18 @@ export function DashboardPage() {
         </PageHeader>
 
         <PageContent>
+          {/* summary metrics */}
           <PageSection>
             <MetricsGrid metrics={METRIC_SUMMARIES} />
           </PageSection>
 
+          {/* charts & products split */}
           <PageSection className="grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_1fr]">
             <SalesChartCard data={SALES_PERFORMANCE} />
             <TopProductsCard products={TOP_PRODUCTS} />
           </PageSection>
 
+          {/* recent orders table */}
           <PageSection>
             <OrdersTable orders={RECENT_ORDERS} />
           </PageSection>
