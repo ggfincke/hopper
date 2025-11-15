@@ -1,23 +1,23 @@
+// src/components/ui/Input.tsx
+// Text input primitive that adapts to theme
 import { type InputHTMLAttributes, forwardRef } from 'react'
 import { useTheme } from '../../hooks/useTheme'
 import { cn } from '../../lib/utils'
 
+// extend native props w/ variant switch
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   variant?: 'default' | 'search'
 }
 
-/**
- * Reusable Input component with theme-aware styling.
- * Supports standard text input and search-specific styling.
- *
- * @param variant - Input style: 'default' or 'search'
- */
+// * Input field that syncs colors to current theme
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ variant = 'default', className, ...props }, ref) => {
     const { isDark } = useTheme()
 
+    // shared typography & focus ring
     const baseClasses = 'w-full bg-transparent text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500'
 
+    // toggle structural styles per variant
     const variantClasses = {
       default: isDark
         ? 'rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-slate-100 placeholder:text-slate-500'

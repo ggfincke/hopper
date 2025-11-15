@@ -1,24 +1,24 @@
+// src/components/ui/Badge.tsx
+// Badge chip for statuses & labels aligned to theme palette
 import { type ReactNode } from 'react'
 import { useTheme } from '../../hooks/useTheme'
 import { cn } from '../../lib/utils'
 
+// allow variant & class overrides
 interface BadgeProps {
   children: ReactNode
   variant?: 'default' | 'success' | 'warning' | 'error' | 'info' | 'indigo' | 'emerald'
   className?: string
 }
 
-/**
- * Badge component for status indicators, labels, and tags.
- * Automatically adapts styling based on theme (light/dark mode).
- *
- * @param variant - Color scheme: 'default', 'success', 'warning', 'error', 'info', 'indigo', 'emerald'
- */
+// * Badge token that pairs iconography & color accent
 export function Badge({ children, variant = 'default', className }: BadgeProps) {
   const { isDark } = useTheme()
 
+  // shared sizing & typography
   const baseClasses = 'inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium'
 
+  // theme-aware color sets per tone
   const variantClasses = {
     default: isDark
       ? 'bg-slate-800 text-slate-200'

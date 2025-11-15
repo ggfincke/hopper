@@ -1,5 +1,8 @@
+// src/components/ui/Avatar.tsx
+// Circle avatar showing initials w/ gradient fill
 import { cn } from '../../lib/utils'
 
+// allow gradient & sizing overrides
 interface AvatarProps {
   initials: string
   size?: 'sm' | 'md' | 'lg'
@@ -7,13 +10,7 @@ interface AvatarProps {
   className?: string
 }
 
-/**
- * Avatar component displaying user initials with gradient background.
- *
- * @param initials - 1-2 character string to display (e.g., "GF")
- * @param size - Avatar size: 'sm' (8), 'md' (10), 'lg' (12)
- * @param gradient - Custom CSS gradient, defaults to colorful gradient
- */
+// * Avatar renders initials chip for quick identity cues
 export function Avatar({ initials, size = 'md', gradient, className }: AvatarProps) {
   const sizeClasses = {
     sm: 'h-8 w-8 text-sm',
