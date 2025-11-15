@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { ThemeContext } from '../context/ThemeContext'
+import { ThemeContext } from '../app/providers/ThemeContext'
 
 /**
  * Custom hook to access theme state and controls from anywhere in the component tree.
