@@ -1,3 +1,5 @@
+// src/features/dashboard/components/leaf/StatusBadge.tsx
+// Displays status chip using Badge variants
 import { Badge } from '../../../../components/ui/Badge'
 
 interface StatusBadgeProps {
@@ -5,13 +7,7 @@ interface StatusBadgeProps {
   tone: 'indigo' | 'emerald'
 }
 
-/**
- * StatusBadge displays order status with appropriate color coding.
- * Maps status tone to Badge variant for consistent styling.
- *
- * @param status - Status text to display (e.g., "Processing", "Completed")
- * @param tone - Color tone: 'indigo' for processing, 'emerald' for completed
- */
+// * StatusBadge forwards props to Badge & keeps tone mapping consistent
 export function StatusBadge({ status, tone }: StatusBadgeProps) {
   return <Badge variant={tone}>{status}</Badge>
 }

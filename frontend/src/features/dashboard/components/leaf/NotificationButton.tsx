@@ -1,9 +1,8 @@
+// src/features/dashboard/components/leaf/NotificationButton.tsx
+// Accent button for notification center entry
 import { Bell } from 'lucide-react'
 
-/**
- * NotificationButton displays notification bell icon.
- * Can be extended to show notification count badge.
- */
+// * NotificationButton leaves room for count badge & future actions
 export function NotificationButton() {
   return (
     <button

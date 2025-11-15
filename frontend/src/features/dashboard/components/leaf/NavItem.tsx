@@ -1,3 +1,5 @@
+// src/features/dashboard/components/leaf/NavItem.tsx
+// Sidebar nav button w/ icon & label
 import { useTheme } from '../../../../hooks/useTheme'
 import { cn } from '../../../../lib/utils'
 
@@ -7,12 +9,7 @@ type NavItemProps = {
   active?: boolean
 }
 
-/**
- * NavItem represents a single navigation link in the sidebar.
- * Highlights active state with indigo background and shadow.
- *
- * @param active - Whether this nav item is currently active
- */
+// * NavItem highlights current section & theme syncs background
 export function NavItem({ icon, label, active }: NavItemProps) {
   const { isDark } = useTheme()
 

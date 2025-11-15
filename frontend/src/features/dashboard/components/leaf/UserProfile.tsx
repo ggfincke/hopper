@@ -1,9 +1,12 @@
+// src/features/dashboard/components/leaf/UserProfile.tsx
+// User profile chip w/ hover/focus dropdown for quick actions
 import { type FocusEvent, useEffect, useRef, useState } from 'react'
 import { LogOut, Moon, Settings, Sparkles, Sun } from 'lucide-react'
 import { useTheme } from '../../../../hooks/useTheme'
 import { Avatar } from '../../../../components/ui/Avatar'
 import { cn } from '../../../../lib/utils'
 
+// allow slight hover forgiveness before hiding
 const CLOSE_MENU_DELAY = 100
 
 interface UserProfileProps {
@@ -13,19 +16,13 @@ interface UserProfileProps {
   className?: string
 }
 
-/**
- * UserProfile displays user avatar and information in the header.
- * Can be extended to include dropdown menu for account actions.
- *
- * @param name - User's full name
- * @param email - User's email address
- * @param initials - User's initials for avatar
- */
+// * UserProfile shows avatar summary & reveals dropdown actions
 export function UserProfile({ name, email, initials, className }: UserProfileProps) {
   const { isDark, toggleTheme } = useTheme()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // open dropdown immediately
   const openMenu = () => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current)
@@ -33,6 +30,7 @@ export function UserProfile({ name, email, initials, className }: UserProfilePro
     setIsMenuOpen(true)
   }
 
+  // delay close so focus can move inside menu
   const scheduleClose = () => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current)
@@ -40,12 +38,14 @@ export function UserProfile({ name, email, initials, className }: UserProfilePro
     closeTimeoutRef.current = setTimeout(() => setIsMenuOpen(false), CLOSE_MENU_DELAY)
   }
 
+  // close when focus leaves wrapper
   const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
     if (!event.currentTarget.contains(event.relatedTarget)) {
       scheduleClose()
     }
   }
 
+  // cleanup on unmount
   useEffect(
     () => () => {
       if (closeTimeoutRef.current) {
@@ -64,6 +64,7 @@ export function UserProfile({ name, email, initials, className }: UserProfilePro
   )
 
   const accentText = isDark ? 'text-slate-400' : 'text-slate-600'
+  // floating menu container styles
   const dropdownClasses = cn(
     'absolute right-0 top-full z-20 mt-2 w-60 rounded-2xl border p-2 text-sm shadow-xl transition-all duration-150',
     isDark
@@ -71,6 +72,7 @@ export function UserProfile({ name, email, initials, className }: UserProfilePro
       : 'border-slate-200 bg-white text-slate-700 shadow-slate-900/5'
   )
 
+  // button styling shared by dropdown actions
   const menuItemClasses = cn(
     'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40',
     isDark ? 'hover:bg-white/5' : 'hover:bg-slate-50'

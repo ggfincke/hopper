@@ -1,11 +1,10 @@
+// src/features/dashboard/components/leaf/ThemeToggle.tsx
+// Icon button that flips color mode & syncs w/ context
 import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '../../../../hooks/useTheme'
 import { cn } from '../../../../lib/utils'
 
-/**
- * ThemeToggle button for switching between light and dark modes.
- * Automatically updates via ThemeContext and displays appropriate icon.
- */
+// * ThemeToggle invokes ThemeContext & swaps icons
 export function ThemeToggle() {
   const { isDark, toggleTheme } = useTheme()
 

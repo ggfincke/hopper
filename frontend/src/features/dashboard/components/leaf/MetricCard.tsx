@@ -1,3 +1,5 @@
+// src/features/dashboard/components/leaf/MetricCard.tsx
+// KPI card showing value & delta trend
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { useTheme } from '../../../../hooks/useTheme'
 import { cn } from '../../../../lib/utils'
@@ -7,12 +9,7 @@ type MetricCardProps = MetricSummary & {
   className?: string
 }
 
-/**
- * MetricCard displays a key performance metric with optional change indicator.
- * Automatically adapts styling based on theme and highlight mode.
- *
- * @param highlight - If true, displays with gradient background
- */
+// * MetricCard optionally highlights hero metric & delta icon
 export function MetricCard({
   title,
   label,

@@ -1,3 +1,5 @@
+// src/features/dashboard/components/leaf/SearchBar.tsx
+// Search input cluster w/ icons & mic button
 import { Search, Mic } from 'lucide-react'
 import { useTheme } from '../../../../hooks/useTheme'
 import { Input } from '../../../../components/ui/Input'
@@ -8,12 +10,7 @@ interface SearchBarProps {
   className?: string
 }
 
-/**
- * SearchBar component with search icon, input field, and voice search button.
- * Themed styling adapts to light/dark mode via useTheme hook.
- *
- * @param placeholder - Input placeholder text
- */
+// * SearchBar shares placeholder & dispatches Input ref down
 export function SearchBar({
   placeholder = 'Search products, orders, customers...',
   className,
@@ -28,6 +25,7 @@ export function SearchBar({
     className
   )
 
+  // styles for mic shortcut
   const micButtonClasses = cn(
     'flex h-8 w-8 items-center justify-center rounded-full text-base transition-colors',
     isDark ? 'bg-slate-800 text-slate-200' : 'bg-indigo-50 text-slate-700'

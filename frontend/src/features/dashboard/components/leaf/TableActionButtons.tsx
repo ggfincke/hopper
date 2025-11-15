@@ -1,10 +1,9 @@
+// src/features/dashboard/components/leaf/TableActionButtons.tsx
+// Cluster of quick actions for table toolbar & exports
 import { useTheme } from '../../../../hooks/useTheme'
 import { cn } from '../../../../lib/utils'
 
-/**
- * TableActionButtons displays action buttons for the orders table.
- * Includes Customize, Filter, and Export options with theme-aware styling.
- */
+// * TableActionButtons applies token styles for Customize/Filter/Export
 export function TableActionButtons() {
   const { isDark } = useTheme()
 
