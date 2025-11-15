@@ -1,3 +1,5 @@
+// src/features/dashboard/components/sections/OrdersTable.tsx
+// Pageless table showing latest commerce orders & actions
 import { MoreHorizontal } from 'lucide-react'
 import { useTheme } from '../../../../hooks/useTheme'
 import { cn } from '../../../../lib/utils'
@@ -9,15 +11,11 @@ type OrdersTableProps = {
   orders: RecentOrder[]
 }
 
-/**
- * OrdersTable displays recent orders with sorting and filtering capabilities.
- * Uses theme context to eliminate props drilling and composed sub-components.
- *
- * @param orders - Array of recent orders to display
- */
+// * OrdersTable renders recent order rows w/ action buttons
 export function OrdersTable({ orders }: OrdersTableProps) {
   const { isDark } = useTheme()
 
+  // card surface & border colors per theme
   const containerClasses = cn(
     'flex flex-col gap-3 rounded-2xl border p-4 shadow-[0_18px_36px_rgba(15,23,42,0.4)]',
     isDark
@@ -25,6 +23,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
       : 'bg-white border-slate-200 text-slate-900'
   )
 
+  // head styling for sticky look
   const tableHeadClasses = cn(
     'text-left text-[11px] uppercase tracking-wide',
     isDark ? 'bg-slate-950/50 text-slate-500' : 'bg-slate-50 text-slate-500'
@@ -40,6 +39,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
 
   return (
     <div className={containerClasses}>
+      {/* toolbar w/ filters */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="text-sm font-semibold">Latest orders</div>
@@ -50,6 +50,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
         <TableActionButtons />
       </div>
 
+      {/* scrollable table wrapper */}
       <div
         className={cn(
           'overflow-x-auto rounded-2xl border',

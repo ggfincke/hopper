@@ -1,3 +1,5 @@
+// src/features/dashboard/components/sections/DashboardHero.tsx
+// Welcome hero messaging block for dashboard top
 import { useTheme } from '../../../../hooks/useTheme'
 import { cn } from '../../../../lib/utils'
 
@@ -6,19 +8,14 @@ interface DashboardHeroProps {
   subtitle?: string
 }
 
-/**
- * DashboardHero displays welcome message and overview subtitle.
- * Highlights user's name with accent color based on theme.
- *
- * @param userName - User's first name to personalize greeting
- * @param subtitle - Optional subtitle text (defaults to sales overview)
- */
+// * DashboardHero greets user & shows context line
 export function DashboardHero({
   userName,
   subtitle = "Here's your current multi-channel sales overview.",
 }: DashboardHeroProps) {
   const { isDark } = useTheme()
 
+  // pick accent tone per theme
   const accentText = isDark ? 'text-slate-400' : 'text-slate-600'
 
   return (

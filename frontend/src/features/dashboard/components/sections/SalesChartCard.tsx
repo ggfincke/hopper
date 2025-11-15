@@ -1,3 +1,5 @@
+// src/features/dashboard/components/sections/SalesChartCard.tsx
+// Dual metric bar chart comparing revenue & orders
 import { useTheme } from '../../../../hooks/useTheme'
 import { cn } from '../../../../lib/utils'
 import type { SalesPoint } from '../../types'
@@ -6,15 +8,11 @@ type SalesChartCardProps = {
   data: SalesPoint[]
 }
 
-/**
- * SalesChartCard displays sales performance over time with a bar chart.
- * Shows revenue and orders side-by-side for trend comparison.
- *
- * @param data - Array of sales data points by month
- */
+// * SalesChartCard renders month slices w/ twin bars per metric
 export function SalesChartCard({ data }: SalesChartCardProps) {
   const { isDark } = useTheme()
 
+  // surface styling toggled by theme
   const containerClasses = cn(
     'flex flex-col gap-3 rounded-2xl border p-4 shadow-[0_16px_40px_rgba(15,23,42,0.35)]',
     isDark
@@ -22,6 +20,7 @@ export function SalesChartCard({ data }: SalesChartCardProps) {
       : 'bg-white border-slate-200 text-slate-900'
   )
 
+  // gradient background for chart stage
   const chartSurfaceClasses = cn(
     'mt-2 flex min-h-[190px] flex-col justify-between rounded-2xl p-4',
     isDark
@@ -35,6 +34,7 @@ export function SalesChartCard({ data }: SalesChartCardProps) {
 
   return (
     <div className={containerClasses}>
+      {/* header w/ legend */}
       <div className="flex items-center justify-between gap-3 text-sm">
         <div>
           <div className="text-sm font-semibold">Sales Overtime</div>
@@ -54,6 +54,7 @@ export function SalesChartCard({ data }: SalesChartCardProps) {
         </div>
       </div>
 
+      {/* chart bars */}
       <div className={chartSurfaceClasses}>
         <div className="flex flex-1 items-end gap-2">
           {data.map(({ month, revenue, orders }) => (

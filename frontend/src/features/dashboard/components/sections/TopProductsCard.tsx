@@ -1,3 +1,5 @@
+// src/features/dashboard/components/sections/TopProductsCard.tsx
+// Ranked list showing best sellers & stock info
 import { useTheme } from '../../../../hooks/useTheme'
 import { cn } from '../../../../lib/utils'
 import type { ProductPerformance } from '../../types'
@@ -6,15 +8,11 @@ type TopProductsCardProps = {
   products: ProductPerformance[]
 }
 
-/**
- * TopProductsCard displays best-selling products with sales and stock info.
- * Highlights the top performer with gradient background.
- *
- * @param products - Array of product performance data
- */
+// * TopProductsCard highlights first row & shows availability ticks
 export function TopProductsCard({ products }: TopProductsCardProps) {
   const { isDark } = useTheme()
 
+  // adjust container palette for theme
   const containerClasses = cn(
     'flex flex-col gap-3 rounded-2xl border p-4 shadow-[0_16px_40px_rgba(15,23,42,0.7)]',
     isDark
@@ -32,6 +30,7 @@ export function TopProductsCard({ products }: TopProductsCardProps) {
 
   return (
     <div className={containerClasses}>
+      {/* header copy w/ CTA */}
       <div className="flex items-center justify-between">
         <div>
           <div className="text-sm font-semibold">Top selling products</div>
@@ -42,6 +41,7 @@ export function TopProductsCard({ products }: TopProductsCardProps) {
         <button className={buttonClasses}>See all</button>
       </div>
 
+      {/* ranked rows */}
       <div className="flex flex-col gap-3">
         {products.map((product, idx) => (
           <div
