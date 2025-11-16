@@ -2,7 +2,7 @@
 // Defines shape for theme control state & creates context shell
 import { createContext } from 'react'
 
-// theme toggling contract consumed by useTheme
+// * ThemeContextValue defines dark mode state & toggle actions for useTheme
 export interface ThemeContextValue {
   isDark: boolean
   toggleTheme: () => void

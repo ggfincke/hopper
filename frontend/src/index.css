@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+html {
+  background: linear-gradient(to bottom right, rgb(241, 245, 249), rgb(255, 255, 255), rgb(226, 232, 240));
+  color: rgb(71, 85, 105);
+}
+
+html.dark {
+  background: radial-gradient(circle at top, #050914, #020617, #01030a);
+  color: rgb(255, 255, 255);
+}
+
+body {
+  min-height: 100vh;
+  background: inherit;
+  color: inherit;
+}
+
+#root {
+  min-height: 100vh;
+  background: inherit;
+  color: inherit;
+}
