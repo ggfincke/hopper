@@ -11,7 +11,6 @@ CREATE INDEX idx_roles_name ON roles (name);
 -- Create unique constraint for role name
 CREATE UNIQUE INDEX uq_roles_name ON roles (name);
 
--- Insert predefined roles with descriptions
 INSERT INTO roles (id, name, description) VALUES 
   (random_uuid(), 'ADMIN', 'System administrator with full access'),
   (random_uuid(), 'USER', 'Regular user with standard permissions'),
