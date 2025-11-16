@@ -1,7 +1,9 @@
 // src/features/dashboard/index.tsx
 // Entry point for customer dashboard experience & layout wiring
+import { useEffect, useRef, useState } from 'react'
 import { AppLayout } from '../../app/layout/AppLayout'
 import { Page, PageContent, PageHeader, PageSection } from '../../components/layout/Page'
+import { useAuth } from '../../hooks/useAuth'
 import { DashboardHeader } from './components/layout/DashboardHeader'
 import { DashboardSidebar } from './components/layout/DashboardSidebar'
 import { DashboardHero } from './components/sections/DashboardHero'
@@ -19,6 +21,37 @@ import {
 
 // * DashboardPage wires layout, sidebar & all content sections
 export function DashboardPage() {
+  const { user, logout } = useAuth()
+  const [isSigningOut, setIsSigningOut] = useState(false)
+  const isMountedRef = useRef(true)
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
+  const userName = user?.username ?? 'Hopper teammate'
+  const userEmail = user?.email ?? 'no-email@hopper.app'
+  const userInitials = deriveInitials(user?.username, user?.email)
+
+  const handleSignOut = async () => {
+    if (isSigningOut) {
+      return
+    }
+
+    setIsSigningOut(true)
+    try {
+      await logout()
+    } catch (error) {
+      console.error('Unable to sign out', error)
+    } finally {
+      if (isMountedRef.current) {
+        setIsSigningOut(false)
+      }
+    }
+  }
+
   // layout shell w/ sidebar nav
   return (
     <AppLayout sidebar={<DashboardSidebar navItems={NAV_ITEMS} />}>
@@ -27,13 +60,15 @@ export function DashboardPage() {
         <PageHeader
           actions={
             <DashboardHeader
-              userName="Garrett Fincke"
-              userEmail="garrett@hopper.app"
-              userInitials="GF"
+              userName={userName}
+              userEmail={userEmail}
+              userInitials={userInitials}
+              onSignOut={handleSignOut}
+              signingOut={isSigningOut}
             />
           }
         >
-          <DashboardHero userName="Garrett" />
+          <DashboardHero userName={userName} />
         </PageHeader>
 
         <PageContent>
@@ -56,4 +91,28 @@ export function DashboardPage() {
       </Page>
     </AppLayout>
   )
+}
+
+// extract 2-letter initials from username or email for avatar display
+function deriveInitials(username?: string | null, email?: string | null) {
+  const source = username?.trim() || email?.trim() || ''
+
+  if (!source) {
+    return 'HO'
+  }
+
+  const parts = source.split(/\s+/).filter(Boolean)
+
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase()
+  }
+
+  if (source.includes('@')) {
+    return source
+      .split('@')[0]
+      .slice(0, 2)
+      .toUpperCase()
+  }
+
+  return source.slice(0, 2).toUpperCase()
 }

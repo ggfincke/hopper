@@ -14,10 +14,12 @@ interface UserProfileProps {
   email: string
   initials: string
   className?: string
+  onSignOut?: () => void | Promise<void>
+  signingOut?: boolean
 }
 
 // * UserProfile shows avatar summary & reveals dropdown actions
-export function UserProfile({ name, email, initials, className }: UserProfileProps) {
+export function UserProfile({ name, email, initials, className, onSignOut, signingOut }: UserProfileProps) {
   const { isDark, toggleTheme } = useTheme()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -74,9 +76,14 @@ export function UserProfile({ name, email, initials, className }: UserProfilePro
 
   // button styling shared by dropdown actions
   const menuItemClasses = cn(
-    'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40',
+    'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 disabled:cursor-not-allowed disabled:opacity-50',
     isDark ? 'hover:bg-white/5' : 'hover:bg-slate-50'
   )
+
+  const handleSignOut = () => {
+    setIsMenuOpen(false)
+    onSignOut?.()
+  }
 
   return (
     <div
@@ -144,11 +151,11 @@ export function UserProfile({ name, email, initials, className }: UserProfilePro
         </button>
 
         <div className={cn('mt-2 border-t pt-2', isDark ? 'border-white/10' : 'border-slate-100')}>
-          <button type="button" className={menuItemClasses}>
+          <button type="button" onClick={handleSignOut} className={menuItemClasses} disabled={signingOut}>
             <div className="flex items-center gap-3">
               <LogOut className="h-4 w-4" />
               <div>
-                <p className="text-xs font-semibold">Sign out</p>
+                <p className="text-xs font-semibold">{signingOut ? 'Signing out…' : 'Sign out'}</p>
                 <p className={cn('text-[11px] font-normal', accentText)}>Exit the dashboard safely</p>
               </div>
             </div>
