@@ -46,3 +46,6 @@ out/
 CLAUDE.md
 
 dev-docs/
+
+# macOS filesystem cruft
+.DS_Store
