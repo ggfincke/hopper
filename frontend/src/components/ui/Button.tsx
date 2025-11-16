@@ -1,20 +1,17 @@
+// src/components/ui/Button.tsx
+// Button primitive that supports variants & theme awareness
 import { type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { useTheme } from '../../hooks/useTheme'
 import { cn } from '../../lib/utils'
 
+// allow size & variant overrides per button
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
   variant?: 'primary' | 'secondary' | 'ghost' | 'icon'
   size?: 'sm' | 'md' | 'lg'
 }
 
-/**
- * Reusable Button component with theme-aware styling and multiple variants.
- * Automatically adapts colors based on theme context (light/dark mode).
- *
- * @param variant - Visual style: 'primary' (filled), 'secondary' (outlined), 'ghost' (minimal), 'icon' (circular)
- * @param size - Button size: 'sm', 'md', 'lg'
- */
+// * Button control that adapts palette to theme state
 export function Button({
   children,
   variant = 'primary',
@@ -24,8 +21,10 @@ export function Button({
 }: ButtonProps) {
   const { isDark } = useTheme()
 
+  // base layout, focus ring & disabled styles
   const baseClasses = 'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
 
+  // apply palette based on variant & theme
   const variantClasses = {
     primary: isDark
       ? 'bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800'
@@ -41,6 +40,7 @@ export function Button({
       : 'rounded-full bg-white text-slate-700 hover:bg-slate-50',
   }
 
+  // size map for paddings & rounded radius
   const sizeClasses = {
     sm: variant === 'icon' ? 'h-8 w-8 text-sm' : 'px-3 py-1.5 text-sm rounded-md',
     md: variant === 'icon' ? 'h-9 w-9 text-base' : 'px-4 py-2 text-sm rounded-lg',

@@ -7,13 +7,9 @@ BEGIN
 END
 $$;
 
-DO $$
-BEGIN
-   IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'hopper') THEN
-      CREATE DATABASE hopper OWNER hopper_user ENCODING 'UTF8';
-   END IF;
-END
-$$;
+-- Create database (cannot use DO block - CREATE DATABASE requires commit)
+SELECT 'CREATE DATABASE hopper OWNER hopper_user ENCODING ''UTF8'''
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'hopper')\gexec
 
 \connect hopper
 

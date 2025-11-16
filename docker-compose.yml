@@ -22,7 +22,7 @@ services:
       - ./docker/db/init.sql:/docker-entrypoint-initdb.d/10-init.sql:ro
       - ./src/main/resources/db/migration:/opt/migrations:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres && psql -U postgres -lqt | cut -d \\| -f 1 | grep -qw hopper"]
       interval: 5s
       timeout: 5s
       retries: 10

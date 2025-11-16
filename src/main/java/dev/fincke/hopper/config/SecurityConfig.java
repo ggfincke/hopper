@@ -148,6 +148,7 @@ public class SecurityConfig
                 // Public endpoints (no authentication required)
                 .requestMatchers(
                     "/api/auth/login",
+                    "/api/auth/register",
                     "/api/auth/refresh",
                     "/api/auth/validate",
                     "/error",

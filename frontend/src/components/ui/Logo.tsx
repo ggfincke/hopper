@@ -1,18 +1,15 @@
+// src/components/ui/Logo.tsx
+// Hopper brandmark showing gradient disk & optional text
 import { cn } from '../../lib/utils'
 
+// size & copy toggles for brand lockup
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg'
   showText?: boolean
   className?: string
 }
 
-/**
- * Hopper brand logo with conic gradient icon.
- * Can be displayed with or without text label.
- *
- * @param size - Logo size: 'sm', 'md', 'lg'
- * @param showText - Whether to show "Hopper" text beside icon
- */
+// * Logo renders gradient badge & optional wordmark
 export function Logo({ size = 'md', showText = true, className }: LogoProps) {
   const sizeClasses = {
     sm: 'h-7 w-7 text-sm',

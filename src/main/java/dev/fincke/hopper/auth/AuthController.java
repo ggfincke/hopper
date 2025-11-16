@@ -2,6 +2,7 @@ package dev.fincke.hopper.auth;
 
 import dev.fincke.hopper.auth.dto.AuthResponse;
 import dev.fincke.hopper.auth.dto.LoginRequest;
+import dev.fincke.hopper.auth.dto.RegisterRequest;
 import dev.fincke.hopper.auth.dto.RefreshTokenRequest;
 import dev.fincke.hopper.auth.dto.TokenValidationResponse;
 import dev.fincke.hopper.config.JwtProperties;
@@ -10,6 +11,7 @@ import dev.fincke.hopper.security.UserPrincipal;
 import dev.fincke.hopper.security.jwt.JwtUtils;
 import dev.fincke.hopper.user.User;
 import dev.fincke.hopper.user.UserService;
+import dev.fincke.hopper.user.dto.UserCreateRequest;
 import dev.fincke.hopper.user.dto.UserResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -74,6 +76,61 @@ public class AuthController
     }
     
     // * Authentication Endpoints
+    
+    // POST /api/auth/register - create a new user account and issue tokens
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest,
+                                               HttpServletResponse response)
+    {
+        // Create the user account (will throw if validation fails)
+        UserCreateRequest createRequest = new UserCreateRequest(
+            registerRequest.username(),
+            registerRequest.email(),
+            registerRequest.password(),
+            null,
+            null
+        );
+        UserResponse userResponse = userService.createUser(createRequest);
+        
+        try
+        {
+            // Load the newly created user as a security principal
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userResponse.username());
+            UserPrincipal userPrincipal = (UserPrincipal) userDetails;
+            
+            // Generate JWT tokens
+            String accessToken = registerRequest.rememberMe()
+                ? jwtUtils.generateRememberMeToken(userPrincipal)
+                : jwtUtils.generateAccessToken(userPrincipal);
+            String refreshToken = jwtUtils.generateRefreshToken(userPrincipal);
+            
+            long accessExpiresIn = registerRequest.rememberMe()
+                ? jwtProperties.getRememberMeExpirationMs() / 1000
+                : jwtProperties.getAccessTokenExpirationMs() / 1000;
+            long refreshExpiresIn = jwtProperties.getRefreshTokenExpirationMs() / 1000;
+            
+            setRefreshTokenCookie(response, refreshToken, refreshExpiresIn);
+            
+            AuthResponse authResponse = AuthResponse.success(
+                accessToken,
+                refreshToken,
+                jwtProperties.getTokenType(),
+                accessExpiresIn,
+                refreshExpiresIn,
+                userResponse
+            );
+            
+            logger.info("New user registered: {} (ID: {})", 
+                userPrincipal.getUsername(), userPrincipal.getId());
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
+        }
+        catch (Exception e)
+        {
+            logger.error("Error completing registration for user: {}", registerRequest.email(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
     
     // POST /api/auth/login - authenticate user and return JWT tokens
     @PostMapping("/login")

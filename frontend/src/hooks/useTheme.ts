@@ -1,22 +1,13 @@
+// src/hooks/useTheme.ts
+// Custom hook to read ThemeContext & guard for provider usage
 import { useContext } from 'react'
-import { ThemeContext } from '../context/ThemeContext'
+import { ThemeContext } from '../app/providers/ThemeContext'
 
-/**
- * Custom hook to access theme state and controls from anywhere in the component tree.
- * Must be used within a ThemeProvider.
- *
- * @returns Theme context containing isDark, toggleTheme, and setTheme
- * @throws Error if used outside ThemeProvider
- *
- * @example
- * function MyComponent() {
- *   const { isDark, toggleTheme } = useTheme()
- *   return <button onClick={toggleTheme}>{isDark ? 'Light' : 'Dark'}</button>
- * }
- */
+// * Access shared theme state & controls
 export function useTheme() {
   const context = useContext(ThemeContext)
 
+  // ensure hook stays inside ThemeProvider boundary
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider')
   }
